@@ -13,7 +13,7 @@ app.use(express.json({ limit: '50mb' }));
 
 const API_KEY = process.env.API_KEY || '';
 const PHONE_NUMBER_ID = process.env.PHONE_NUMBER_ID || '';
-const BUSINESS_PHONE = process.env.BUSINESS_PHONE || '0718374853';
+const BUSINESS_PHONE = process.env.BUSINESS_PHONE || '0718374853'; 
 const WEBHOOK_VERIFY_TOKEN = process.env.WEBHOOK_VERIFY_TOKEN || '';
 const DATABASE_URL = process.env.DATABASE_URL || '';
 const WHATSAPP_API = 'https://waba-v2.360dialog.io';
