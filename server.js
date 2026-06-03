@@ -208,24 +208,26 @@ async function generateAIResponse(message) {
   
   const responses = {
     greeting: {
-      en: `Hello! Welcome to Cornerstone Supreme Education. I'm your AI assistant, available 24/7 to help you.\n\nWe offer 8 professional courses with industry-recognized certifications.\n\nHow can I help you today?`,
-      af: `Hallo! Welkom by Cornerstone Supreme Education. Ek is jou AI-assistent, beskikbaar 24/7 om jou te help.\n\nOns bied 8 professionele kursusse aan. Hoe kan ek jou help?`,
-      zu: `Sawubona! Siyakwamukela eCornerstone Supreme Education. Ngingumsizi wakho we-AI.\n\nSinikeza izifundo eziyisishiyagalombili. Ngingakusiza kanjani?`,
+       const responses = {
+    greeting: {
+      en: `Hello there! Welcome to Cornerstone Supreme Education. I'm Lerato, your course advisor. I'm always here to help you find the perfect course.\n\nWe offer 8 professional courses with industry-recognized certifications.\n\nHow can I help you today?`,
+      af: `Hallo! Welkom by Cornerstone Supreme Education. Ek is Lerato, jou kursusadviseur. Ek is altyd hier om jou te help om die perfekte kursus te vind.\n\nOns bied 8 professionele kursusse aan. Hoe kan ek jou help?`,
+      zu: `Sawubona! Siyakwamukela eCornerstone Supreme Education. NginguLerato, umeluleki wakho wezifundo. Ngilapha njalo ukukusiza uthole isifundo esifanele.\n\nSinikeza izifundo eziyisishiyagalombili. Ngingakusiza kanjani?`,
     },
     courses: {
-      en: `We offer 8 professional courses at Cornerstone Supreme:\n\n${COURSES.map((c, i) => `${i+1}. ${c.title} (${c.category}) - ${c.price}`).join('\n')}\n\nVisit our website: https://www.cornerstonehr.co.za\n\nWhich course interests you? I can provide more details!`,
+      en: `We offer 8 professional courses at Cornerstone Supreme:\n\n${COURSES.map((c, i) => `${i+1}. ${c.title} (${c.category}) - ${c.price}`).join('\n')}\n\nVisit our website: https://www.cornerstonehr.co.za\n\nWhich course interests you? I'd be happy to provide more details!`,
     },
     pricing: {
-      en: `Our courses range from R4,500 to R9,500 depending on the program.\n\nPopular courses:\n${COURSES.slice(0, 4).map(c => `- ${c.title}: ${c.price}`).join('\n')}\n\nPayment options:\n- Full payment (5% discount)\n- Monthly installments\n- Employer-sponsored\n\nWould you like pricing for a specific course?`,
+      en: `Our courses range from R4,500 to R9,500 depending on the program.\n\nPopular courses:\n${COURSES.slice(0, 4).map(c => `- ${c.title}: ${c.price}`).join('\n')}\n\nPayment options:\n- Full payment (5% discount)\n- Monthly installments\n- Employer-sponsored\n\nWould you like pricing for a specific course? I'm here to help!`,
     },
     enrollment: {
       en: `Excellent choice! Here's how to enroll at Cornerstone Supreme:\n\n1. Visit: https://www.cornerstonehr.co.za\n2. Click "Enroll Now" on your chosen course\n3. Fill in your details\n4. Choose payment option (full or installments)\n5. You'll receive confirmation within 24 hours\n\nOr tell me which course and I'll guide you step by step!`,
     },
     brochure: {
-      en: `Here's our course catalog:\nhttps://www.cornerstonehr.co.za\n\nWe offer courses in:\n- Business Management\n- HR Management\n- Project Management\n- Digital Marketing\n- Leadership Development\n- Financial Management\n- Health & Safety\n- Customer Service\n\nWhich field interests you? I can send specific details.`,
+      en: `Here's our course catalog:\nhttps://www.cornerstonehr.co.za\n\nWe offer courses in:\n- Business Management\n- HR Management\n- Project Management\n- Digital Marketing\n- Leadership Development\n- Financial Management\n- Health & Safety\n- Customer Service\n\nWhich field interests you? I'd love to send you specific details!`,
     },
     thanks: {
-      en: `You're welcome! If you have any more questions about our courses, feel free to ask. I'm here 24/7!`,
+      en: `You're welcome! If you have any more questions about our courses, feel free to ask. I'm always happy to help!`,
     },
     goodbye: {
       en: `Goodbye! Thank you for your interest in Cornerstone Supreme. Feel free to message us anytime. Have a great day!`,
@@ -234,9 +236,6 @@ async function generateAIResponse(message) {
       en: `Thank you for contacting Cornerstone Supreme Education! We offer industry-recognized professional courses.\n\nHow can I help you today?\n- Browse our 8 courses\n- Check pricing\n- Enrollment information\n- Request a brochure\n- Payment options`,
     },
   };
-  
-  return {
-    response: (responses[intent]?.[lang] || responses[intent]?.en || responses.general.en),
     intent,
     lang,
   };
