@@ -621,7 +621,7 @@ app.post('/api/webhook/whatsapp', async (req, res) => {
     await saveMessage(from, name, text, response, intent, lang);
     await sendWhatsAppMessage(from, response);
     
-    console.log(`[${new Date().toISOString()}] Lerato replied to ${from}: ...: ${response.substring(0, 80)}...`);
+    console.log(`[${new Date().toISOString()}] Lerato replied to ${from}: ...
   } catch (err) {
     console.error('Webhook error:', err.message);
   }
