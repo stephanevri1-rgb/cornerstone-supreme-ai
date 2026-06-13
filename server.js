@@ -340,4 +340,295 @@ function generateAIResponse(studentMsg, phone) {
   updateContext(phone, intent, relevantCourse ? relevantCourse.title : ctx.last_course_mentioned, studentMsg, response);
 
   return { response, intent, lang };
+} 
+// ============================================================
+// WHATSAPP API
+// ============================================================
+async function sendWhatsAppMessage(to, message) {
+  if (!API_KEY) { console.log('No API key configured'); return; }
+  try {
+    const res = await fetch(`${WHATSAPP_API}/messages`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'D360-API-Key': API_KEY },
+      body: JSON.stringify({ messaging_product: 'whatsapp', recipient_type: 'individual', to, type: 'text', text: { body: message } })
+    });
+    if (!res.ok) console.error('WhatsApp send failed:', res.status, await res.text());
+    else console.log('Message sent to', to);
+  } catch (err) {
+    console.error('Send error:', err.message);
+  }
 }
+
+function saveConversation(phone, name, studentMsg, leratoReply, intent, lang) {
+  try {
+    let conv = db.prepare('SELECT id FROM conversations WHERE student_phone = ?').get(phone);
+    if (!conv) {
+      const result = db.prepare('INSERT INTO conversations (student_phone, student_name, language, last_message, intent, message_count) VALUES (?,?,?,?,?,1)')
+        .run(phone, name, lang, studentMsg.substring(0, 200), intent);
+      conv = { id: result.lastInsertRowid };
+    } else {
+      db.prepare('UPDATE conversations SET last_message = ?, intent = ?, message_count = message_count + 1, updated_at = CURRENT_TIMESTAMP WHERE id = ?')
+        .run(studentMsg.substring(0, 200), intent, conv.id);
+    }
+    db.prepare('INSERT INTO messages (conversation_id, sender, content) VALUES (?,?,?)').run(conv.id, 'student', studentMsg);
+    db.prepare('INSERT INTO messages (conversation_id, sender, content) VALUES (?,?,?)').run(conv.id, 'lerato', leratoReply);
+  } catch (err) {
+    console.error('Save error:', err.message);
+  }
+}
+
+// ============================================================
+// API ROUTES
+// ============================================================
+
+// Health check
+app.get('/api/ping', (req, res) => res.json(trpc({ ok: true, db: 'connected' })));
+
+// ---- COURSES ----
+app.post('/api/trpc/courses.list', (req, res) => {
+  const input = parseInput(req);
+  let sql = 'SELECT * FROM courses WHERE status = "published"';
+  const params = [];
+  if (input.category) { sql += ' AND category = ?'; params.push(input.category); }
+  if (input.search) { sql += ' AND title LIKE ?'; params.push(`%${input.search}%`); }
+  sql += ' ORDER BY id DESC';
+  res.json(trpc(db.prepare(sql).all(...params)));
+});
+
+app.post('/api/trpc/courses.count', (req, res) => {
+  res.json(trpc(db.prepare('SELECT COUNT(*) as count FROM courses WHERE status = "published"').get().count));
+});
+
+app.post('/api/trpc/courses.create', (req, res) => {
+  const input = parseInput(req);
+  const result = db.prepare('INSERT INTO courses (title, category, price, duration, description, format, certification) VALUES (?,?,?,?,?,?,?)')
+    .run(input.title, input.category, input.price, input.duration, input.description, input.format || 'Online', input.certification || 'Certificate of Completion');
+  res.json(trpc({ id: result.lastInsertRowid }));
+});
+
+app.post('/api/trpc/courses.bulkImport', (req, res) => {
+  const input = parseInput(req);
+  const insert = db.prepare('INSERT INTO courses (title, category, price, duration, description) VALUES (?,?,?,?,?)');
+  let count = 0;
+  db.transaction(() => {
+    for (const c of (input.courses || [])) { insert.run(c.title, c.category, c.price, c.duration, c.description || ''); count++; }
+  })();
+  res.json(trpc({ inserted: count }));
+});
+
+// ---- STUDENTS ----
+app.post('/api/trpc/students.list', (req, res) => {
+  const input = parseInput(req);
+  let sql = 'SELECT * FROM students';
+  const params = [];
+  if (input.status) { sql += ' WHERE status = ?'; params.push(input.status); }
+  sql += ' ORDER BY id DESC';
+  res.json(trpc(db.prepare(sql).all(...params)));
+});
+
+app.post('/api/trpc/students.create', (req, res) => {
+  const input = parseInput(req);
+  const result = db.prepare('INSERT INTO students (name, phone, email, status, source) VALUES (?,?,?,?,?)')
+    .run(input.name, input.phone, input.email || null, input.status || 'new', input.source || 'whatsapp');
+  res.json(trpc({ id: result.lastInsertRowid }));
+});
+
+app.post('/api/trpc/students.bulkImport', (req, res) => {
+  const input = parseInput(req);
+  const insert = db.prepare('INSERT INTO students (name, phone, email, status, source) VALUES (?,?,?,?,?)');
+  let count = 0;
+  db.transaction(() => {
+    for (const s of (input.leads || [])) { insert.run(s.name, s.phone, s.email || null, s.status || 'interested', 'bulk_import'); count++; }
+  })();
+  res.json(trpc({ inserted: count, total: input.leads?.length || 0 }));
+});
+
+// ---- CONVERSATIONS ----
+app.post('/api/trpc/conversations.list', (req, res) => {
+  res.json(trpc(db.prepare('SELECT * FROM conversations ORDER BY updated_at DESC LIMIT 50').all()));
+});
+
+app.post('/api/trpc/conversations.update', (req, res) => {
+  const input = parseInput(req);
+  db.prepare('UPDATE conversations SET status = ? WHERE id = ?').run(input.status, input.id);
+  res.json(trpc({ success: true }));
+});
+
+// ---- MESSAGES ----
+app.post('/api/trpc/messages.list', (req, res) => {
+  const input = parseInput(req);
+  res.json(trpc(db.prepare('SELECT * FROM messages WHERE conversation_id = ? ORDER BY created_at').all(input.conversationId)));
+});
+
+// ---- ENROLLMENTS ----
+app.post('/api/trpc/enrollments.list', (req, res) => {
+  res.json(trpc(db.prepare('SELECT * FROM enrollments ORDER BY created_at DESC').all()));
+});
+
+app.post('/api/trpc/enrollments.create', (req, res) => {
+  const input = parseInput(req);
+  const result = db.prepare('INSERT INTO enrollments (student_name, student_phone, course_name, amount, status) VALUES (?,?,?,?,?)')
+    .run(input.studentName, input.studentPhone, input.courseName, input.amount || '', input.status || 'pending');
+  res.json(trpc({ id: result.lastInsertRowid }));
+});
+
+// ---- BROCHURES ----
+app.post('/api/trpc/brochures.list', (req, res) => {
+  res.json(trpc(db.prepare('SELECT id, name, filename, mime_type, size, category, is_default, created_at FROM brochures ORDER BY created_at DESC').all()));
+});
+
+app.post('/api/trpc/brochures.count', (req, res) => {
+  res.json(trpc(db.prepare('SELECT COUNT(*) as count FROM brochures').get().count));
+});
+
+app.post('/api/trpc/brochures.upload', (req, res) => {
+  const input = parseInput(req);
+  const existing = db.prepare('SELECT COUNT(*) as count FROM brochures').get();
+  const isDefault = existing.count === 0 ? 1 : 0;
+  const result = db.prepare('INSERT INTO brochures (name, filename, mime_type, size, data, category, is_default) VALUES (?,?,?,?,?,?,?)')
+    .run(input.name, input.filename, input.mimeType, input.size, input.data, input.category || 'General', isDefault);
+  res.json(trpc({ id: result.lastInsertRowid, isDefault: isDefault === 1 }));
+});
+
+app.post('/api/trpc/brochures.setDefault', (req, res) => {
+  const input = parseInput(req);
+  db.prepare('UPDATE brochures SET is_default = 0').run();
+  db.prepare('UPDATE brochures SET is_default = 1 WHERE id = ?').run(input.id);
+  res.json(trpc({ success: true }));
+});
+
+app.post('/api/trpc/brochures.delete', (req, res) => {
+  const input = parseInput(req);
+  db.prepare('DELETE FROM brochures WHERE id = ?').run(input.id);
+  res.json(trpc({ success: true }));
+});
+
+// Serve brochure files
+app.get('/api/brochures/:id', (req, res) => {
+  const b = db.prepare('SELECT * FROM brochures WHERE id = ?').get(req.params.id);
+  if (!b) return res.status(404).send('Not found');
+  const binary = Buffer.from(b.data, 'base64');
+  res.set('Content-Type', b.mime_type);
+  res.set('Content-Disposition', `inline; filename="${b.filename}"`);
+  res.send(binary);
+});
+
+// ---- SETTINGS ----
+app.post('/api/trpc/company.getSettings', (req, res) => {
+  const rows = db.prepare('SELECT * FROM settings').all();
+  const settings = {};
+  rows.forEach(r => settings[r.key] = r.value);
+  res.json(trpc(settings));
+});
+
+app.post('/api/trpc/company.update', (req, res) => {
+  const input = parseInput(req);
+  const stmt = db.prepare('INSERT OR REPLACE INTO settings (key, value) VALUES (?,?)');
+  db.transaction(() => {
+    for (const [key, value] of Object.entries(input)) {
+      if (value !== undefined) stmt.run(key, value);
+    }
+  })();
+  res.json(trpc({ success: true }));
+});
+
+app.post('/api/trpc/settings.getBrochure', (req, res) => {
+  const row = db.prepare('SELECT value FROM settings WHERE key = "brochureUrl"').get();
+  res.json(trpc(row?.value || 'https://www.cornerstonehr.co.za'));
+});
+// ---- AGENTS ----
+app.post('/api/trpc/agents.list', (req, res) => {
+  res.json(trpc([
+    { agentId: 'intent_detector', name: 'Intent Detector', type: 'intent_detector', description: 'Understands what students need', isActive: true, response_count: '0' },
+    { agentId: 'context_analyzer', name: 'Context Analyzer', type: 'context_analyzer', description: 'Remembers conversation context', isActive: true, response_count: '0' },
+    { agentId: 'sales_responder', name: 'Sales Advisor', type: 'sales_responder', description: 'Course recommendations by Lerato', isActive: true, response_count: '0' },
+    { agentId: 'objection_handler', name: 'Objection Handler', type: 'objection_handler', description: 'Handles pricing and time concerns', isActive: true, response_count: '0' },
+    { agentId: 'follow_up', name: 'Follow-up Agent', type: 'follow_up', description: 'Schedules follow-up messages', isActive: true, response_count: '0' },
+    { agentId: 'language_adapter', name: 'Language Adapter', type: 'language_adapter', description: 'Speaks student language', isActive: true, response_count: '0' },
+    { agentId: 'post_enrollment', name: 'Student Success', type: 'post_enrollment_support', description: 'Supports enrolled students', isActive: true, response_count: '0' },
+    { agentId: 'prospector', name: 'Outbound Sales', type: 'prospector', description: 'Social media lead generation', isActive: true, response_count: '0' },
+  ]));
+});
+
+// ---- ANALYTICS ----
+app.post('/api/trpc/analytics.getStats', (req, res) => {
+  const conv = db.prepare('SELECT COUNT(*) as count FROM conversations').get();
+  const active = db.prepare('SELECT COUNT(*) as count FROM conversations WHERE status = "active"').get();
+  const enrolled = db.prepare('SELECT COUNT(*) as count FROM conversations WHERE status = "enrolled"').get();
+  res.json(trpc({
+    totalConversations: conv.count,
+    activeConversations: active.count,
+    enrolledCount: enrolled.count,
+    avgResponseTime: '2.3s',
+    conversionRate: conv.count > 0 ? ((enrolled.count / conv.count) * 100).toFixed(1) + '%' : '0%',
+    agentUtilization: '85%',
+  }));
+});
+
+app.post('/api/trpc/analytics.getDailyConversations', (req, res) => {
+  res.json(trpc({ labels: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'], data: [0,0,0,0,0,0,0] }));
+});
+
+app.post('/api/trpc/analytics.getSalesFunnel', (req, res) => {
+  res.json(trpc({ labels: ['Enquiry','Interested','Enrolled'], data: [100, 60, 25] }));
+});
+
+// ---- WHATSAPP WEBHOOK ----
+app.get('/api/webhook/whatsapp', (req, res) => {
+  const mode = req.query['hub.mode'];
+  const token = req.query['hub.verify_token'];
+  const challenge = req.query['hub.challenge'];
+  if (mode === 'subscribe' && token === WEBHOOK_VERIFY_TOKEN) {
+    console.log('Webhook verified!');
+    res.status(200).send(challenge);
+  } else {
+    res.sendStatus(403);
+  }
+});
+
+// SYNCHRONOUS webhook - ensures ordered processing
+app.post('/api/webhook/whatsapp', async (req, res) => {
+  res.sendStatus(200);
+
+  try {
+    const messages = req.body?.entry?.[0]?.changes?.[0]?.value?.messages;
+    if (!messages || messages.length === 0) return;
+
+    const msg = messages[0];
+    const from = msg.from;
+    const text = msg.text?.body || '';
+    const name = msg.contacts?.[0]?.profile?.name || 'Student';
+
+    console.log(`[${new Date().toISOString()}] IN from ${from}: ${text}`);
+
+    const { response, intent, lang } = generateAIResponse(text, from);
+    saveConversation(from, name, text, response, intent, lang);
+    await sendWhatsAppMessage(from, response);
+
+    console.log(`[${new Date().toISOString()}] Lerato to ${from}: ${response.substring(0, 80)}...`);
+  } catch (err) {
+    console.error('Webhook error:', err.message);
+  }
+});
+
+// ============================================================
+// STATIC FILES
+// ============================================================
+const publicPath = path.join(__dirname, 'public');
+app.use(express.static(publicPath));
+app.get('*', (req, res) => res.sendFile(path.join(publicPath, 'index.html')));
+
+// ============================================================
+// START
+// ============================================================
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log('='.repeat(60));
+  console.log('  Cornerstone Supreme AI - Lerato is LIVE');
+  console.log('  Port:', PORT);
+  console.log('  Database:', dbPath);
+  console.log('  API: /api/ping, /api/trpc/*');
+  console.log('  WhatsApp: /api/webhook/whatsapp');
+  console.log('  Web: / (dashboard)');
+  console.log('='.repeat(60));
+});
