@@ -239,7 +239,6 @@ Jane Smith, 27839876543, jane@email.com
 const API = window.location.origin;
 let allCourses = [];
 
-// Show page
 function showPage(page) {
   document.querySelectorAll('[id^="page-"]').forEach(p => p.classList.add('hidden'));
   document.getElementById('page-' + page).classList.remove('hidden');
@@ -251,7 +250,6 @@ function showPage(page) {
   if (page === 'enrollments') { loadEnrollments(); loadCourseOptions(); }
 }
 
-// tRPC helper
 async function trpc(endpoint, input) {
   try {
     const res = await fetch(`${API}/api/trpc/${endpoint}`, {
@@ -266,7 +264,6 @@ async function trpc(endpoint, input) {
   }
 }
 
-// Load stats
 async function loadStats() {
   const stats = await trpc('analytics.getStats');
   if (stats) {
@@ -284,7 +281,6 @@ async function loadStats() {
   badge.classList.remove('offline');
 }
 
-// Load courses
 async function loadCourses() {
   const courses = await trpc('courses.list');
   allCourses = courses || [];
@@ -305,7 +301,6 @@ async function loadCourses() {
   loadBrochures();
 }
 
-// Load brochures
 async function loadBrochures() {
   const brochures = await trpc('brochures.list');
   const list = document.getElementById('brochures-list');
@@ -324,7 +319,6 @@ async function loadBrochures() {
   `).join('');
 }
 
-// Upload brochure
 async function uploadBrochure(input) {
   const file = input.files[0];
   if (!file) return;
@@ -348,14 +342,12 @@ async function uploadBrochure(input) {
   reader.readAsDataURL(file);
 }
 
-// Delete brochure
 async function deleteBrochure(id) {
   if (!confirm('Delete this brochure?')) return;
   await trpc('brochures.delete', {id});
   loadBrochures();
 }
 
-// Load conversations
 async function loadConversations() {
   const convs = await trpc('conversations.list');
   const list = document.getElementById('conversations-list');
@@ -370,7 +362,6 @@ async function loadConversations() {
     }).join('') + '</tbody></table>';
 }
 
-// Load students
 async function loadStudents() {
   const students = await trpc('students.list');
   const list = document.getElementById('students-list');
@@ -385,7 +376,6 @@ async function loadStudents() {
     }).join('') + '</tbody></table>';
 }
 
-// Load course options for enrollment
 async function loadCourseOptions() {
   const courses = await trpc('courses.list');
   const select = document.getElementById('enroll-course');
@@ -397,7 +387,6 @@ async function loadCourseOptions() {
   };
 }
 
-// Submit enrollment
 async function submitEnrollment() {
   const name = document.getElementById('enroll-name').value;
   const phone = document.getElementById('enroll-phone').value;
@@ -416,7 +405,6 @@ async function submitEnrollment() {
   }
 }
 
-// Load enrollments
 async function loadEnrollments() {
   const enrolls = await trpc('enrollments.list');
   const list = document.getElementById('enrollments-list');
@@ -431,7 +419,6 @@ async function loadEnrollments() {
     }).join('') + '</tbody></table>';
 }
 
-// Import leads
 async function importLeads() {
   const input = document.getElementById('leads-input').value.trim();
   const msg = document.getElementById('import-msg');
@@ -454,7 +441,6 @@ async function importLeads() {
   }
 }
 
-// Save settings
 async function saveSettings() {
   const msg = document.getElementById('settings-msg');
   msg.innerHTML = '<div class="alert alert-success">Saving... <span class="spinner"></span></div>';
@@ -471,7 +457,6 @@ async function saveSettings() {
     accountType: document.getElementById('set-acctype').value,
     branchCode: document.getElementById('set-branch').value,
   };
-  // Save to localStorage for offline persistence
   Object.entries(settings).forEach(([k,v]) => localStorage.setItem('setting_' + k, v));
   const result = await trpc('company.update', settings);
   if (result) {
@@ -481,7 +466,6 @@ async function saveSettings() {
   }
 }
 
-// Load settings from localStorage on page load
 function loadLocalSettings() {
   const fields = ['name','phone','website','email','apikey','phoneid','webhook','bank','account','acctype','branch'];
   fields.forEach(f => {
@@ -490,7 +474,6 @@ function loadLocalSettings() {
   });
 }
 
-// Init
 loadStats();
 loadLocalSettings();
 setInterval(loadStats, 30000);
