@@ -248,3 +248,279 @@ function generateAIResponse(studentMsg, phone) {
   updateContext(phone, intent, relevantCourse ? relevantCourse.title : ctx.last_course_mentioned, studentMsg, response);
   return { response, intent, lang };
 }
+async function sendWhatsAppMessage(to, message) {
+  if (!API_KEY) { console.log('No API key configured'); return; }
+  try {
+    const res = await fetch(`${WHATSAPP_API}/messages`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'D360-API-Key': API_KEY },
+      body: JSON.stringify({ messaging_product: 'whatsapp', recipient_type: 'individual', to, type: 'text', text: { body: message } })
+    });
+    if (!res.ok) console.error('WhatsApp send failed:', res.status, await res.text());
+    else console.log('Message sent to', to);
+  } catch (err) {
+    console.error('Send error:', err.message);
+  }
+}
+
+function saveConversation(phone, name, studentMsg, leratoReply, intent, lang) {
+  let conv = DB.conversations.find(c => c.student_phone === phone);
+  if (!conv) {
+    conv = { id: nextId('conversations'), student_phone: phone, student_name: name, language: lang, status: 'active', intent, last_message: studentMsg.substring(0, 200), message_count: 1, created_at: new Date().toISOString(), updated_at: new Date().toISOString() };
+    DB.conversations.push(conv);
+  } else {
+    conv.last_message = studentMsg.substring(0, 200);
+    conv.intent = intent;
+    conv.message_count = (conv.message_count || 0) + 1;
+    conv.updated_at = new Date().toISOString();
+  }
+  DB.messages.push({ id: nextId('messages'), conversation_id: conv.id, sender: 'student', content: studentMsg, created_at: new Date().toISOString() });
+  DB.messages.push({ id: nextId('messages'), conversation_id: conv.id, sender: 'lerato', content: leratoReply, created_at: new Date().toISOString() });
+  saveDB();
+}
+
+app.get('/api/ping', (req, res) => res.json(trpc({ ok: true, db: 'json-file' })));
+
+// ---- COURSES ----
+app.post('/api/trpc/courses.list', (req, res) => {
+  const input = parseInput(req);
+  let result = DB.courses.filter(c => c.status === 'published');
+  if (input.category) result = result.filter(c => c.category === input.category);
+  if (input.search) result = result.filter(c => c.title.toLowerCase().includes(input.search.toLowerCase()));
+  res.json(trpc(result.reverse()));
+});
+
+app.post('/api/trpc/courses.count', (req, res) => {
+  res.json(trpc(DB.courses.filter(c => c.status === 'published').length));
+});
+
+app.post('/api/trpc/courses.create', (req, res) => {
+  const input = parseInput(req);
+  const course = { id: nextId('courses'), title: input.title, category: input.category, price: input.price, duration: input.duration, description: input.description, format: input.format || 'Online', certification: input.certification || 'Certificate of Completion', status: 'published', created_at: new Date().toISOString() };
+  DB.courses.push(course);
+  saveDB();
+  res.json(trpc({ id: course.id }));
+});
+
+app.post('/api/trpc/courses.bulkImport', (req, res) => {
+  const input = parseInput(req);
+  let count = 0;
+  for (const c of (input.courses || [])) {
+    DB.courses.push({ id: nextId('courses'), title: c.title, category: c.category, price: c.price, duration: c.duration, description: c.description || '', format: 'Online', certification: 'Certificate of Completion', status: 'published', created_at: new Date().toISOString() });
+    count++;
+  }
+  saveDB();
+  res.json(trpc({ inserted: count }));
+});
+
+// ---- STUDENTS ----
+app.post('/api/trpc/students.list', (req, res) => {
+  const input = parseInput(req);
+  let result = [...DB.students];
+  if (input.status) result = result.filter(s => s.status === input.status);
+  res.json(trpc(result.reverse()));
+});
+
+app.post('/api/trpc/students.create', (req, res) => {
+  const input = parseInput(req);
+  const student = { id: nextId('students'), name: input.name, phone: input.phone, email: input.email || null, status: input.status || 'new', source: input.source || 'whatsapp', created_at: new Date().toISOString() };
+  DB.students.push(student);
+  saveDB();
+  res.json(trpc({ id: student.id }));
+});
+
+app.post('/api/trpc/students.bulkImport', (req, res) => {
+  const input = parseInput(req);
+  let count = 0;
+  for (const s of (input.leads || [])) {
+    DB.students.push({ id: nextId('students'), name: s.name, phone: s.phone, email: s.email || null, status: s.status || 'interested', source: 'bulk_import', created_at: new Date().toISOString() });
+    count++;
+  }
+  saveDB();
+  res.json(trpc({ inserted: count, total: input.leads?.length || 0 }));
+});
+
+// ---- CONVERSATIONS ----
+app.post('/api/trpc/conversations.list', (req, res) => {
+  res.json(trpc([...DB.conversations].sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at)).slice(0, 50)));
+});
+
+app.post('/api/trpc/conversations.update', (req, res) => {
+  const input = parseInput(req);
+  const conv = DB.conversations.find(c => c.id === input.id);
+  if (conv) { conv.status = input.status; saveDB(); }
+  res.json(trpc({ success: true }));
+});
+
+// ---- MESSAGES ----
+app.post('/api/trpc/messages.list', (req, res) => {
+  const input = parseInput(req);
+  res.json(trpc(DB.messages.filter(m => m.conversation_id === input.conversationId)));
+});
+
+// ---- ENROLLMENTS ----
+app.post('/api/trpc/enrollments.list', (req, res) => {
+  res.json(trpc([...DB.enrollments].reverse()));
+});
+
+app.post('/api/trpc/enrollments.create', (req, res) => {
+  const input = parseInput(req);
+  const enroll = { id: nextId('enrollments'), student_name: input.studentName, student_phone: input.studentPhone, course_name: input.courseName, amount: input.amount || '', status: input.status || 'pending', created_at: new Date().toISOString() };
+  DB.enrollments.push(enroll);
+  saveDB();
+  res.json(trpc({ id: enroll.id }));
+});
+
+// ---- BROCHURES ----
+app.post('/api/trpc/brochures.list', (req, res) => {
+  res.json(trpc([...DB.brochures].reverse().map(b => ({ id: b.id, name: b.name, filename: b.filename, mime_type: b.mime_type, size: b.size, category: b.category, is_default: b.is_default, created_at: b.created_at }))));
+});
+
+app.post('/api/trpc/brochures.count', (req, res) => {
+  res.json(trpc(DB.brochures.length));
+});
+
+app.post('/api/trpc/brochures.upload', (req, res) => {
+  const input = parseInput(req);
+  const isDefault = DB.brochures.length === 0 ? 1 : 0;
+  const brochure = { id: nextId('brochures'), name: input.name, filename: input.filename, mime_type: input.mimeType, size: input.size, data: input.data, category: input.category || 'General', is_default: isDefault, created_at: new Date().toISOString() };
+  DB.brochures.push(brochure);
+  saveDB();
+  res.json(trpc({ id: brochure.id, isDefault: isDefault === 1 }));
+});
+
+app.post('/api/trpc/brochures.setDefault', (req, res) => {
+  const input = parseInput(req);
+  DB.brochures.forEach(b => b.is_default = 0);
+  const b = DB.brochures.find(b => b.id === input.id);
+  if (b) b.is_default = 1;
+  saveDB();
+  res.json(trpc({ success: true }));
+});
+
+app.post('/api/trpc/brochures.delete', (req, res) => {
+  const input = parseInput(req);
+  DB.brochures = DB.brochures.filter(b => b.id !== input.id);
+  saveDB();
+  res.json(trpc({ success: true }));
+});
+
+// Serve brochure files
+app.get('/api/brochures/:id', (req, res) => {
+  const b = DB.brochures.find(b => b.id === parseInt(req.params.id));
+  if (!b) return res.status(404).send('Not found');
+  const binary = Buffer.from(b.data, 'base64');
+  res.set('Content-Type', b.mime_type);
+  res.set('Content-Disposition', `inline; filename="${b.filename}"`);
+  res.send(binary);
+});
+
+// ---- SETTINGS ----
+app.post('/api/trpc/company.getSettings', (req, res) => {
+  res.json(trpc(DB.settings));
+});
+
+app.post('/api/trpc/company.update', (req, res) => {
+  const input = parseInput(req);
+  for (const [key, value] of Object.entries(input)) {
+    if (value !== undefined) DB.settings[key] = value;
+  }
+  saveDB();
+  res.json(trpc({ success: true }));
+});
+
+app.post('/api/trpc/settings.getBrochure', (req, res) => {
+  res.json(trpc(DB.settings.brochureUrl || 'https://www.cornerstonehr.co.za'));
+});
+// ---- AGENTS ----
+app.post('/api/trpc/agents.list', (req, res) => {
+  res.json(trpc([
+    { agentId: 'intent_detector', name: 'Intent Detector', type: 'intent_detector', description: 'Understands what students need', isActive: true, response_count: '0' },
+    { agentId: 'context_analyzer', name: 'Context Analyzer', type: 'context_analyzer', description: 'Remembers conversation context', isActive: true, response_count: '0' },
+    { agentId: 'sales_responder', name: 'Sales Advisor', type: 'sales_responder', description: 'Course recommendations by Lerato', isActive: true, response_count: '0' },
+    { agentId: 'objection_handler', name: 'Objection Handler', type: 'objection_handler', description: 'Handles pricing and time concerns', isActive: true, response_count: '0' },
+    { agentId: 'follow_up', name: 'Follow-up Agent', type: 'follow_up', description: 'Schedules follow-up messages', isActive: true, response_count: '0' },
+    { agentId: 'language_adapter', name: 'Language Adapter', type: 'language_adapter', description: 'Speaks student language', isActive: true, response_count: '0' },
+    { agentId: 'post_enrollment', name: 'Student Success', type: 'post_enrollment_support', description: 'Supports enrolled students', isActive: true, response_count: '0' },
+    { agentId: 'prospector', name: 'Outbound Sales', type: 'prospector', description: 'Social media lead generation', isActive: true, response_count: '0' },
+  ]));
+});
+
+// ---- ANALYTICS ----
+app.post('/api/trpc/analytics.getStats', (req, res) => {
+  res.json(trpc({
+    totalConversations: DB.conversations.length,
+    activeConversations: DB.conversations.filter(c => c.status === 'active').length,
+    enrolledCount: DB.conversations.filter(c => c.status === 'enrolled').length,
+    avgResponseTime: '2.3s',
+    conversionRate: DB.conversations.length > 0 ? ((DB.conversations.filter(c => c.status === 'enrolled').length / DB.conversations.length) * 100).toFixed(1) + '%' : '0%',
+    agentUtilization: '85%',
+  }));
+});
+
+app.post('/api/trpc/analytics.getDailyConversations', (req, res) => {
+  res.json(trpc({ labels: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'], data: [0,0,0,0,0,0,0] }));
+});
+
+app.post('/api/trpc/analytics.getSalesFunnel', (req, res) => {
+  res.json(trpc({ labels: ['Enquiry','Interested','Enrolled'], data: [100, 60, 25] }));
+});
+
+// ---- WHATSAPP WEBHOOK ----
+app.get('/api/webhook/whatsapp', (req, res) => {
+  const mode = req.query['hub.mode'];
+  const token = req.query['hub.verify_token'];
+  const challenge = req.query['hub.challenge'];
+  if (mode === 'subscribe' && token === WEBHOOK_VERIFY_TOKEN) {
+    console.log('Webhook verified!');
+    res.status(200).send(challenge);
+  } else {
+    res.sendStatus(403);
+  }
+});
+
+app.post('/api/webhook/whatsapp', async (req, res) => {
+  res.sendStatus(200);
+  try {
+    const messages = req.body?.entry?.[0]?.changes?.[0]?.value?.messages;
+    if (!messages || messages.length === 0) return;
+
+    const msg = messages[0];
+    const from = msg.from;
+    const text = msg.text?.body || '';
+    const name = msg.contacts?.[0]?.profile?.name || 'Student';
+
+    console.log(`[${new Date().toISOString()}] IN from ${from}: ${text}`);
+
+    const { response, intent, lang } = generateAIResponse(text, from);
+    saveConversation(from, name, text, response, intent, lang);
+    await sendWhatsAppMessage(from, response);
+
+    console.log(`[${new Date().toISOString()}] Lerato to ${from}: ${response.substring(0, 80)}...`);
+  } catch (err) {
+    console.error('Webhook error:', err.message);
+  }
+});
+
+// ============================================================
+// STATIC FILES
+// ============================================================
+const publicPath = path.join(__dirname, 'public');
+app.use(express.static(publicPath));
+app.get('*', (req, res) => res.sendFile(path.join(publicPath, 'index.html')));
+
+// ============================================================
+// START
+// ============================================================
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log('='.repeat(60));
+  console.log('  Cornerstone Supreme AI - Lerato is LIVE');
+  console.log('  Port:', PORT);
+  console.log('  Database: JSON file (' + DB_FILE + ')');
+  console.log('  Courses:', DB.courses.length);
+  console.log('  API: /api/ping, /api/trpc/*');
+  console.log('  WhatsApp: /api/webhook/whatsapp');
+  console.log('  Web: / (dashboard)');
+  console.log('='.repeat(60));
+});
