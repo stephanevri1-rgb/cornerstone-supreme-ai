@@ -136,7 +136,6 @@ label{display:block;font-size:13px;color:#94a3b8;margin-bottom:5px;font-weight:5
     <div class="course-grid" id="courses-grid"></div>
   </div>
 </div>
-
 <!-- CONVERSATIONS -->
 <div id="page-conversations" class="hidden">
   <div class="header"><h1>Conversations</h1><button class="btn btn-primary btn-sm" onclick="loadConversations()">Refresh</button></div>
@@ -174,15 +173,51 @@ label{display:block;font-size:13px;color:#94a3b8;margin-bottom:5px;font-weight:5
 <!-- PROSPECTING -->
 <div id="page-prospecting" class="hidden">
   <div class="header"><h1>Prospecting</h1></div>
+  
   <div class="section">
-    <h2>Bulk Import Leads</h2>
+    <h2>Import Leads from Text</h2>
     <label>Paste leads (one per line: Name, Phone, Email)</label>
-    <textarea id="leads-input" rows="8" placeholder="John Doe, 27821234567, john@email.com
+    <textarea id="leads-input" rows="6" placeholder="John Doe, 27821234567, john@email.com
 Jane Smith, 27839876543, jane@email.com
 ..."></textarea>
     <button class="btn btn-primary" onclick="importLeads()">Import Leads</button>
     <div id="import-msg" style="margin-top:10px"></div>
   </div>
+
+  <div class="section">
+    <h2>Upload CSV or Excel File</h2>
+    <label>Upload a .csv or .xlsx file with columns: Name, Phone, Email (optional)</label>
+    <div class="upload-area" onclick="document.getElementById('csvFileInput').click()" style="margin-bottom:15px;">
+      <input type="file" id="csvFileInput" accept=".csv,.xlsx,.xls,.txt" onchange="uploadCSVFile(this)" style="display:none;">
+      <svg width="40" height="40" fill="none" stroke="#64748b" stroke-width="1.5" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      <p style="color:#94a3b8;margin-top:10px">Click to upload CSV, Excel, or TXT file</p>
+      <p style="color:#64748b;font-size:12px;margin-top:5px">Max 5MB | Formats: .csv, .xlsx, .xls, .txt</p>
+    </div>
+    <div id="csv-upload-msg"></div>
+  </div>
+
+  <div class="section">
+    <h2>Upload Screenshot or Image of Customer List</h2>
+    <label>Upload a photo or screenshot of your customer list. The image will be saved for your reference and manual entry.</label>
+    <div class="upload-area" onclick="document.getElementById('screenshotInput').click()" style="margin-bottom:15px;">
+      <input type="file" id="screenshotInput" accept="image/*,.pdf" onchange="uploadScreenshot(this)" style="display:none;">
+      <svg width="40" height="40" fill="none" stroke="#64748b" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+      <p style="color:#94a3b8;margin-top:10px">Click to upload image or PDF screenshot</p>
+      <p style="color:#64748b;font-size:12px;margin-top:5px">JPG, PNG, GIF, PDF | Max 10MB</p>
+    </div>
+    <div id="screenshot-upload-msg"></div>
+    <div id="screenshot-gallery" style="margin-top:15px;"></div>
+  </div>
+
+  <div class="section">
+    <h2>Imported Leads</h2>
+    <div style="margin-bottom:15px;">
+      <button class="btn btn-primary btn-sm" onclick="loadImportedLeads()">Refresh</button>
+      <button class="btn btn-danger btn-sm" onclick="clearAllLeads()" style="margin-left:10px;">Clear All</button>
+    </div>
+    <div id="imported-leads-table"><div class="empty-state">No leads imported yet</div></div>
+  </div>
+
   <div class="section">
     <h2>Quick Stats</h2>
     <div class="grid" style="grid-template-columns:repeat(3,1fr)">
@@ -206,7 +241,7 @@ Jane Smith, 27839876543, jane@email.com
       </div>
       <div class="form-grid">
         <div><label>Website</label><input type="text" id="set-website" value="https://www.cornerstonehr.co.za"></div>
-        <div><label>Email</label><input type="text" id="set-email" value="info@cornerstonehr.co.za"></div>
+        <div><label>Email</label><input type="text" id="set-email" value="stephane@cornerstonehr.co.za"></div>
       </div>
     </div>
     <div class="settings-group">
@@ -243,7 +278,6 @@ Jane Smith, 27839876543, jane@email.com
 const API = window.location.origin;
 let allCourses = [];
 
-// Show page
 function showPage(page) {
   document.querySelectorAll('[id^="page-"]').forEach(p => p.classList.add('hidden'));
   document.getElementById('page-' + page).classList.remove('hidden');
@@ -255,7 +289,6 @@ function showPage(page) {
   if (page === 'enrollments') { loadEnrollments(); loadCourseOptions(); }
 }
 
-// tRPC helper
 async function trpc(endpoint, input) {
   try {
     const res = await fetch(`${API}/api/trpc/${endpoint}`, {
@@ -270,7 +303,6 @@ async function trpc(endpoint, input) {
   }
 }
 
-// Load stats
 async function loadStats() {
   const stats = await trpc('analytics.getStats');
   if (stats) {
@@ -288,7 +320,6 @@ async function loadStats() {
   badge.classList.remove('offline');
 }
 
-// Load courses
 async function loadCourses() {
   const courses = await trpc('courses.list');
   allCourses = courses || [];
@@ -309,7 +340,6 @@ async function loadCourses() {
   loadBrochures();
 }
 
-// Load brochures
 async function loadBrochures() {
   const brochures = await trpc('brochures.list');
   const list = document.getElementById('brochures-list');
@@ -328,7 +358,6 @@ async function loadBrochures() {
   `).join('');
 }
 
-// Upload brochure
 async function uploadBrochure(input) {
   const file = input.files[0];
   if (!file) return;
@@ -352,14 +381,12 @@ async function uploadBrochure(input) {
   reader.readAsDataURL(file);
 }
 
-// Delete brochure
 async function deleteBrochure(id) {
   if (!confirm('Delete this brochure?')) return;
   await trpc('brochures.delete', {id});
   loadBrochures();
 }
 
-// Load conversations
 async function loadConversations() {
   const convs = await trpc('conversations.list');
   const list = document.getElementById('conversations-list');
@@ -374,7 +401,6 @@ async function loadConversations() {
     }).join('') + '</tbody></table>';
 }
 
-// Load students
 async function loadStudents() {
   const students = await trpc('students.list');
   const list = document.getElementById('students-list');
@@ -388,9 +414,7 @@ async function loadStudents() {
       return `<tr><td>${s.name}</td><td>${s.phone}</td><td>${s.email || '-'}</td><td><span class="badge ${statusClass}">${s.status || 'New'}</span></td><td>${s.source || 'WhatsApp'}</td></tr>`;
     }).join('') + '</tbody></table>';
 }
-
-// Load course options for enrollment
-async function loadCourseOptions() {
+  async function loadCourseOptions() {
   const courses = await trpc('courses.list');
   const select = document.getElementById('enroll-course');
   select.innerHTML = '<option value="">Select a course</option>' +
@@ -401,7 +425,6 @@ async function loadCourseOptions() {
   };
 }
 
-// Submit enrollment
 async function submitEnrollment() {
   const name = document.getElementById('enroll-name').value;
   const phone = document.getElementById('enroll-phone').value;
@@ -420,7 +443,6 @@ async function submitEnrollment() {
   }
 }
 
-// Load enrollments
 async function loadEnrollments() {
   const enrolls = await trpc('enrollments.list');
   const list = document.getElementById('enrollments-list');
@@ -435,7 +457,6 @@ async function loadEnrollments() {
     }).join('') + '</tbody></table>';
 }
 
-// Import leads
 async function importLeads() {
   const input = document.getElementById('leads-input').value.trim();
   const msg = document.getElementById('import-msg');
@@ -453,12 +474,129 @@ async function importLeads() {
     msg.innerHTML = '<div class="alert alert-success">Successfully imported ' + (result.inserted || leads.length) + ' leads!</div>';
     document.getElementById('leads-input').value = '';
     loadStudents();
+    loadImportedLeads();
   } else {
     msg.innerHTML = '<div class="alert alert-error">Import failed. API may be offline.</div>';
   }
 }
 
-// Save settings
+async function uploadCSVFile(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const msg = document.getElementById('csv-upload-msg');
+  msg.innerHTML = '<div class="alert alert-success">Reading file... <span class="spinner"></span></div>';
+  const reader = new FileReader();
+  reader.onload = async function(e) {
+    const content = e.target.result;
+    const lines = content.split('\n').filter(l => l.trim());
+    const leads = [];
+    let skipped = 0;
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trim();
+      if (!line || line.toLowerCase().includes('name') && line.toLowerCase().includes('phone')) { skipped++; continue; }
+      const parts = line.split(',').map(p => p.trim().replace(/^["']|["']$/g, ''));
+      if (parts.length >= 2 && parts[0] && parts[1]) {
+        leads.push({name: parts[0], phone: parts[1], email: parts[2] || ''});
+      }
+    }
+    if (leads.length === 0) {
+      msg.innerHTML = '<div class="alert alert-error">No valid leads found in file. Make sure it has Name,Phone,Email columns.</div>';
+      input.value = '';
+      return;
+    }
+    msg.innerHTML = '<div class="alert alert-success">Found ' + leads.length + ' leads. Importing... <span class="spinner"></span></div>';
+    const result = await trpc('students.bulkImport', {leads});
+    if (result) {
+      msg.innerHTML = '<div class="alert alert-success">Successfully imported ' + (result.inserted || leads.length) + ' leads from file!' + (skipped > 0 ? ' (' + skipped + ' header lines skipped)' : '') + '</div>';
+      input.value = '';
+      loadStudents();
+      loadImportedLeads();
+    } else {
+      msg.innerHTML = '<div class="alert alert-error">Import failed. API may be offline.</div>';
+    }
+  };
+  reader.onerror = function() {
+    msg.innerHTML = '<div class="alert alert-error">Failed to read file. Try again.</div>';
+  };
+  reader.readAsText(file);
+}
+
+async function uploadScreenshot(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const msg = document.getElementById('screenshot-upload-msg');
+  msg.innerHTML = '<div class="alert alert-success">Uploading... <span class="spinner"></span></div>';
+  const reader = new FileReader();
+  reader.onload = async function(e) {
+    const base64 = e.target.result.split(',')[1];
+    const result = await trpc('leads.uploadScreenshot', {
+      name: file.name, filename: file.name, mimeType: file.type || 'image/png',
+      size: String(file.size), data: base64
+    });
+    if (result && result.id) {
+      msg.innerHTML = '<div class="alert alert-success">Screenshot uploaded successfully! You can view it below and manually enter the leads.</div>';
+      input.value = '';
+      loadScreenshots();
+    } else {
+      msg.innerHTML = '<div class="alert alert-error">Upload failed. Try again.</div>';
+    }
+  };
+  reader.onerror = function() {
+    msg.innerHTML = '<div class="alert alert-error">Failed to read file. Try again.</div>';
+  };
+  reader.readAsDataURL(file);
+}
+
+async function loadScreenshots() {
+  const screenshots = await trpc('leads.listScreenshots');
+  const gallery = document.getElementById('screenshot-gallery');
+  if (!screenshots || screenshots.length === 0) {
+    gallery.innerHTML = '<div class="empty-state" style="padding:20px;">No screenshots uploaded yet</div>';
+    return;
+  }
+  gallery.innerHTML = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:15px;">' +
+    screenshots.map(s => `
+      <div style="background:#0f172a;border:1px solid #334155;border-radius:8px;overflow:hidden;">
+        <a href="/api/screenshots/${s.id}" target="_blank" style="display:block;height:120px;background:#1e293b;display:flex;align-items:center;justify-content:center;text-decoration:none;">
+          <span style="color:#64748b;font-size:12px;">📎 ${s.name}</span>
+        </a>
+        <div style="padding:10px;display:flex;justify-content:space-between;align-items:center;">
+          <small style="color:#94a3b8;font-size:11px;">${new Date(s.created_at).toLocaleDateString()}</small>
+          <button class="btn btn-danger btn-sm" onclick="deleteScreenshot(${s.id})">Delete</button>
+        </div>
+      </div>
+    `).join('') + '</div>';
+}
+
+async function deleteScreenshot(id) {
+  if (!confirm('Delete this screenshot?')) return;
+  await trpc('leads.deleteScreenshot', {id});
+  loadScreenshots();
+}
+
+async function loadImportedLeads() {
+  const leads = await trpc('leads.list');
+  const table = document.getElementById('imported-leads-table');
+  if (!leads || leads.length === 0) {
+    table.innerHTML = '<div class="empty-state">No leads imported yet</div>';
+    document.getElementById('stat-prospects').textContent = '0';
+    return;
+  }
+  document.getElementById('stat-prospects').textContent = leads.length;
+  table.innerHTML = '<table><thead><tr><th>Name</th><th>Phone</th><th>Email</th><th>Course Interest</th><th>Status</th><th>Date</th></tr></thead><tbody>' +
+    leads.map(l => {
+      const li = l.leadInfo || {};
+      return `<tr><td>${li.fullName || '-'}</td><td>${l.phone || '-'}</td><td>${li.email || '-'}</td><td>${l.courseInterest || '-'}</td><td><span class="badge badge-blue">${l.status || 'New'}</span></td><td>${new Date(l.created_at).toLocaleDateString()}</td></tr>`;
+    }).join('') + '</tbody></table>';
+}
+
+async function clearAllLeads() {
+  if (!confirm('Are you sure you want to delete ALL imported leads? This cannot be undone.')) return;
+  await trpc('leads.clearAll');
+  loadImportedLeads();
+  loadStudents();
+}
+
 async function saveSettings() {
   const msg = document.getElementById('settings-msg');
   msg.innerHTML = '<div class="alert alert-success">Saving... <span class="spinner"></span></div>';
@@ -486,7 +624,6 @@ async function saveSettings() {
   }
 }
 
-// Load settings from localStorage on page load
 function loadLocalSettings() {
   const fields = ['name','phone','website','email','apikey','phoneid','webhook','bank','accname','account','branch','swift','office'];
   fields.forEach(f => {
@@ -495,7 +632,6 @@ function loadLocalSettings() {
   });
 }
 
-// Init
 loadStats();
 loadLocalSettings();
 setInterval(loadStats, 30000);
