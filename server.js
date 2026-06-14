@@ -338,11 +338,26 @@ Step 3: Write the exam and get certified
 
 ### RE 5 SALES CLOSING FRAMEWORK — FOLLOW THIS FOR RE 5 ENQUIRIES:
 0. **Lead with the Problem** — Highlight the legal requirement. Without RE 5, they cannot legally work in financial services. Use fear of missing out.
-1. **Focus on Benefits, Not Features** — Don't just list modules. Explain how each element helps them pass the exam and advance their career.
-2. **Use Social Proof** — Mention "hundreds of successful candidates" who have passed through Cornerstone Supreme.
-3. **Create Urgency** — Limited spaces per intake. This month intakes are on the 22nd and 29th.
-4. **Keep it Scannable** — Use bullet points, emojis, and short paragraphs.
-5. **Include All Contact Methods** — Phone, WhatsApp, and physical address for credibility.
+1. **Explain the Two Learning Methods** — Present both Online and Face-to-Face options clearly with their benefits.
+2. **Ask Which Method They Prefer** — "We offer two ways to study for your RE 5 — Online Learning and Face-to-Face Learning. Which study method would work best for you?"
+3. **Present Intake Dates with Choice-Based Close** — After they choose a method, present the dates and ask: "We currently have available intakes starting on 22 June 2026 and 29 June 2026. Which of these dates would you prefer to begin your RE5 programme?"
+4. **Use Social Proof** — Mention "hundreds of successful candidates" who have passed through Cornerstone Supreme.
+5. **Create Urgency** — Limited spaces per intake.
+6. **Keep it Scannable** — Use bullet points, emojis, and short paragraphs.
+7. **Include All Contact Methods** — Phone, WhatsApp, and physical address for credibility.
+
+### RE 5 CONVERSATION FLOW (IN ADDITION TO EXISTING SALES FRAMEWORK):
+This is a step-by-step closing technique SPECIFIC to RE5 enquiries. Use it ON TOP OF the existing 7-step sales framework — not instead of it.
+
+- Step 1: Lead with the problem (legal requirement + FOMO)
+- Step 2: Explain the two learning methods clearly (Online vs Face-to-Face)
+- Step 3: Ask "Which study method do you prefer — Online Learning or Face-to-Face Learning?"
+- Step 4: WAIT for their response. Only then present intake dates.
+- Step 5: Ask "We currently have available intakes starting on 22 June 2026 and 29 June 2026. Which of these dates would you prefer to begin your RE5 programme?"
+- Step 6: After they pick a date, move to collecting their details (Full Name, DOB, Email, Phone) for registration
+- Step 7: Continue with the standard close — management sends registration form, invoice, etc.
+
+KEY: Do not overwhelm. One step at a time. Each message should move the prospect closer to a decision.
 
 ### RE 5 INTAKE DATES (THIS MONTH):
 • 22nd of this month
@@ -858,41 +873,46 @@ ${intake.urgencyMessage}
 
 What field are you currently in, or what career are you aiming for? I can recommend the best course for your goals. 😊`;
       } else if (/\b(re5|re 5|regulatory exam|fais|fsca)\b/.test(lower)) {
-        response = `Did you know the RE 5 Regulatory Examination is a **legal requirement** for anyone working in financial services in South Africa? Without it, you cannot legally operate in the industry. Don't let your career be held back!
+        response = `Did you know the RE 5 is a **legal requirement** for everyone in financial services in South Africa? Without it, you simply cannot work in the industry legally. Don't let your career be held back!
 
-We have **two preparation options** — both completed within 6 weeks:
+We offer **two ways to prepare** for your RE 5 — both completed within 6 weeks:
 
-💻 **Online Preparation — R1,000**
-• Face-to-face and online blended learning experience
-• Full coverage of all 10 RE 5 modules
-• Live facilitator-led training sessions
-• Access to experienced instructors throughout
-• Comprehensive study guides and practice examinations
-• Web pocket quick learning platform
-• Podcasts and revision support material
-• Pre-recorded video course explainers
-• Mock examinations under exam conditions
-• Topic-based questions and activities
-• 24/7 access to recorded sessions
+💻 **Online Learning — R1,000**
+Study from anywhere with live facilitator-led sessions, comprehensive study guides, mock exams, 24/7 recorded sessions, podcasts, video explainers, and full coverage of all 10 RE 5 modules.
 
-🏢 **Face-to-Face Preparation — R1,500**
-• **Includes everything the online learner gets**
-• Plus: Attends every Monday for 6 weeks at our headquarters
-• In-person instruction at 367 Surrey Avenue, Ground Floor, Block B, Randburg
+🏢 **Face-to-Face Learning — R1,500**
+Everything in the online programme PLUS you attend in-person sessions every Monday for 6 weeks at our Randburg office (367 Surrey Avenue, Ground Floor, Block B).
 
-⚡ **This month's intakes:** 22nd and 29th — limited spaces available!
+**Which study method would you prefer — Online Learning or Face-to-Face Learning?** 😊`;
+        ctx.stage = 're5_method_selection';
+      } else if (ctx.stage === 're5_method_selection' && /\b(online|face|face-to-face|face to face)\b/.test(lower)) {
+        const method = /\b(face|face-to-face|face to face)\b/.test(lower) ? 'Face-to-Face' : 'Online';
+        const price = /\b(face|face-to-face|face to face)\b/.test(lower) ? 'R1,500' : 'R1,000';
+        response = `Great choice! The ${method} programme at ${price} is an excellent way to prepare. We've helped hundreds of candidates pass their RE 5 — you'll be in great hands!
 
-📝 **What happens after training?**
-After your 6-week preparation with us, you'll book directly at **Moonstone** to write the official RE 5 exam. We prepare you thoroughly — Moonstone administers the exam. We'll guide you through the booking process.
+Now, we currently have available intakes starting on:
+📅 **22 June 2026**
+📅 **29 June 2026**
 
-💳 **Payment:** Full upfront required (no instalments). Pay via EFT or at our office. No online e-commerce payments.
+Spaces are limited, so I recommend securing your spot quickly.
 
-🏦 **Banking Details:**
-Bank: FNB | Account Name: Cornerstone Supreme
-Account: 62653109283 | Branch: 261750 | SWIFT: FIRNZAJJ
-Reference: Your Name | Email proof to: info@cornerstonehr.co.za
+**Which of these dates would you prefer to begin your RE5 programme — 22 June 2026 or 29 June 2026?** 😊`;
+        ctx.stage = 're5_date_selection';
+      } else if (ctx.stage === 're5_date_selection' && /\b(22|29|twenty|first|second|june)\b/.test(lower)) {
+        const date = /\b(29|twenty-?nine)\b/.test(lower) ? '29 June 2026' : '22 June 2026';
+        response = `Perfect! I've noted **${date}** as your preferred start date. Let me get your registration sorted right away!
 
-We've helped hundreds of candidates successfully pass their RE 5. Which option suits you better — online or face-to-face? 😊`;
+To secure your spot, I'll need a few details from you. Our management team will then send your registration form and invoice directly. Payment is required in full upfront before your start date — EFT or at our office only.
+
+Could you please share:
+• Your full name and surname
+• Your date of birth
+• Your email address
+• An alternative contact number
+
+And after you complete the 6-week training with us, we'll guide you through booking your official exam at Moonstone.
+
+Let's get you started — what's your full name and surname? 😊`;
         ctx.stage = 'lead_collection';
       } else if (relevantCourse) {
         response = `${relevantCourse.title} is an excellent choice! Here's what you need to know:
