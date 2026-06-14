@@ -42,7 +42,8 @@ function createDefaultDB() {
       { id: 7, title: 'National Certificate Financial Markets and Instruments NQF 6', category: 'Finance', price: 'R22,000', duration: '12 months', description: 'One-year online qualification (SAQA ID: 50481, 120 Credits, NQF Level 6). Develops competent professionals who can analyse and make informed decisions in the financial landscape. Covers investment decisions, company analysis, debt market, market trends, cash flow analysis, and risk management.', format: 'Online', certification: 'National Certificate NQF 6', status: 'published' },
       { id: 8, title: 'Online Advanced Business Administration', category: 'Business', price: 'R4,500', duration: '6 months', description: 'Teaches essential administrative duties, business operations, processes, and customer service basics. 15 modules spanning leadership, finance, technology, and core business skills. Advanced Certificate.', format: 'Online', certification: 'Advanced Certificate', status: 'published' },
       { id: 9, title: 'Professional Receptionist Online Short Course', category: 'Business', price: 'R4,500', duration: '6 months', description: 'Launch your career in business administration, customer service, and office management. 16 comprehensive modules including business foundations, communication & relations, service & marketing, and Microsoft Office Suite.', format: 'Online', certification: 'Advanced Certificate', status: 'published' },
-      { id: 10, title: 'RE 5 Regulatory Examination Preparation', category: 'Finance', price: 'R1,500', duration: '6 weeks', description: '6-week preparation for the RE 5 Regulatory Examination, mandatory for financial services providers in South Africa. Covers FAIS Act, duties of the FAIS Ombud, FSCA rights, license requirements, fit and proper requirements, code of conduct, and FICA.', format: 'Online', certification: 'Certificate of Completion', status: 'published' },
+      { id: 10, title: 'RE 5 Regulatory Examination Preparation (Online)', category: 'Finance', price: 'R1,000', duration: '6 weeks', description: 'Online preparation for the RE 5 Regulatory Examination, mandatory for financial services providers in South Africa. Covers all 10 RE 5 modules via live facilitator-led sessions. Full upfront payment required.', format: 'Online', certification: 'Certificate of Completion', status: 'published' },
+      { id: 13, title: 'RE 5 Regulatory Examination Preparation (Face-to-Face)', category: 'Finance', price: 'R1,500', duration: '6 weeks', description: 'Face-to-face preparation for the RE 5 Regulatory Examination at our Randburg headquarters. Attends every Monday for 6 weeks. Includes everything from the online programme plus in-person instruction. Full upfront payment required.', format: 'Face-to-Face', certification: 'Certificate of Completion', status: 'published' },
       { id: 11, title: 'Risk Management Training Programme', category: 'Business', price: 'R6,000', duration: '3 weeks', description: 'Aligned to SAQA ID 252025. Prepares you to identify, assess, and manage risk within your unit. Grounded in ISO 31000 and COSO internationally recognised standards. Certificate of Competence.', format: 'Online & Face-to-Face', certification: 'Certificate of Competence', status: 'published' },
       { id: 12, title: 'National Certificate Banking NQF 5', category: 'Banking', price: 'R12,000', duration: '12 months', description: '120-credit qualification (SAQA ID: 20186, NQF Level 5). Gateway to commercial banks, consumer lending institutions, cooperative financial organizations, and government regulatory departments. Six core modules. BankSETA Accredited.', format: 'Online', certification: 'National Certificate NQF 5', status: 'published' }
     ],
@@ -66,7 +67,7 @@ function createDefaultDB() {
       swiftCode: 'FIRNZAJJ'
     },
     context: {},
-    _nextId: { courses: 13, students: 1, conversations: 1, messages: 1, enrollments: 1, brochures: 1, leads: 1 }
+    _nextId: { courses: 14, students: 1, conversations: 1, messages: 1, enrollments: 1, brochures: 1, leads: 1 }
   };
 }
 
@@ -292,9 +293,66 @@ Johannesburg
 7. National Certificate Financial Markets and Instruments NQF 6 — R22,000 — 12 months — National Certificate
 8. Online Advanced Business Administration — R4,500 — 6 months — Advanced Certificate
 9. Professional Receptionist Online Short Course — R4,500 — 6 months — Advanced Certificate
-10. RE 5 Regulatory Examination Preparation — R1,500 — 6 weeks — Certificate of Completion
-11. Risk Management Training Programme — R6,000 — 3 weeks — Certificate of Competence
-12. National Certificate Banking NQF 5 — R12,000 — 12 months — National Certificate (BankSETA Accredited)
+10. RE 5 Regulatory Examination Preparation (Online) — R1,000 — 6 weeks — Certificate of Completion
+11. RE 5 Regulatory Examination Preparation (Face-to-Face) — R1,500 — 6 weeks — Certificate of Completion
+12. Risk Management Training Programme — R6,000 — 3 weeks — Certificate of Competence
+13. National Certificate Banking NQF 5 — R12,000 — 12 months — National Certificate (BankSETA Accredited)
+
+## RE 5 REGULATORY EXAMINATION PREPARATION — SPECIAL DETAILED INFORMATION
+The RE 5 is a **mandatory legal requirement** for all financial services providers in South Africa. Without it, you cannot legally operate in the financial services industry. This is a powerful motivator — lead with the problem.
+
+### TWO LEARNING OPTIONS:
+
+**Option A — Online Preparation: R1,000**
+• Face-to-face and online blended learning experience
+• Full coverage of all 10 RE 5 modules
+• Live facilitator-led training sessions
+• Access to experienced instructors throughout the programme
+• Comprehensive study guides and practice examinations
+• Web pocket quick learning platform
+• Podcasts and revision support material
+• Pre-recorded video course explainers
+• Mock examinations under exam conditions
+• Topic-based questions and activities
+• 24/7 access to recorded sessions
+
+**Option B — Face-to-Face Preparation: R1,500**
+• **Includes everything the online learner gets**
+• Plus: Attends every Monday for 6 weeks at our headquarters
+• In-person instruction at: 367 Surrey Avenue, Ground Floor, Block B, Randburg
+
+### RE 5 EXAM PROCESS (IMPORTANT — TELL EVERY PROSPECT):
+After completing the 6-week preparation with Cornerstone Supreme, the learner must **book independently at Moonstone** to write the official RE 5 examination. Cornerstone prepares you thoroughly — Moonstone administers the exam.
+
+Step 1: Complete your 6-week preparation with us
+Step 2: Book your exam directly at Moonstone (we'll guide you on how)
+Step 3: Write the exam and get certified
+
+### RE 5 PAYMENT RULES (STRICT):
+• **Full upfront payment only** — NO instalments
+• Payment via EFT or at the office only
+• **NO e-commerce payment on the website**
+• Must be paid in full before the starting day
+• Banking details: FNB, Account Name: Cornerstone Supreme, Account: 62653109283, Branch: 261750, SWIFT: FIRNZAJJ, Reference: Your Name
+• Proof of payment to: info@cornerstonehr.co.za
+
+### RE 5 SALES CLOSING FRAMEWORK — FOLLOW THIS FOR RE 5 ENQUIRIES:
+0. **Lead with the Problem** — Highlight the legal requirement. Without RE 5, they cannot legally work in financial services. Use fear of missing out.
+1. **Focus on Benefits, Not Features** — Don't just list modules. Explain how each element helps them pass the exam and advance their career.
+2. **Use Social Proof** — Mention "hundreds of successful candidates" who have passed through Cornerstone Supreme.
+3. **Create Urgency** — Limited spaces per intake. This month intakes are on the 22nd and 29th.
+4. **Keep it Scannable** — Use bullet points, emojis, and short paragraphs.
+5. **Include All Contact Methods** — Phone, WhatsApp, and physical address for credibility.
+
+### RE 5 INTAKE DATES (THIS MONTH):
+• 22nd of this month
+• 29th of this month
+Learner should decide which date suits them. Payment must be made in full upfront before the starting day.
+
+## WEBSITE AND LMS ACCESS
+• Main Website: www.cornerstonehr.co.za
+• LMS Login (study kit): www.cornerstonehr.co.za/lms
+• Alternative LMS: www.cornerstonehr.co.za/learn
 
 ## CURRENT INTAKE INFORMATION (AUTOMATICALLY UPDATED)
 ${intake.urgencyMessage}
@@ -372,11 +430,13 @@ Reassure the prospect that management will send the necessary registration docum
 Example close: "Thank you so much for sharing those details with me, [Name]. I'll pass everything along to our management team, and they will send you the registration form and invoice shortly. In the meantime, do you have any other questions I can help you with?"
 
 ## GENERAL INFO
-- All courses are online via live virtual sessions
+- All courses are online via live virtual sessions (except RE 5 Face-to-Face which is at our Randburg office)
 - Study from anywhere in South Africa
 - Requirements: Matric certificate + basic computer literacy
 - Certifications are industry-recognized, aligned with NQF standards
 - Recorded sessions available for revision
+- Website: www.cornerstonehr.co.za
+- LMS Access (for study materials): www.cornerstonehr.co.za/lms or www.cornerstonehr.co.za/learn
 
 ## CONVERSATION RULES
 - ALWAYS follow the Sales Framework: Greet → Intro → Needs Discovery → Assist → Question-Based Selling → Lead Qualification → Close
@@ -474,7 +534,12 @@ function extractCourseMention(msg) {
     'financial markets': 'National Certificate Financial Markets and Instruments NQF 6',
     'business admin': 'Online Advanced Business Administration',
     'receptionist': 'Professional Receptionist Online Short Course',
-    're 5': 'RE 5 Regulatory Examination Preparation',
+    're 5': 'RE 5 Regulatory Examination Preparation (Online)',
+    're5': 'RE 5 Regulatory Examination Preparation (Online)',
+    're5 online': 'RE 5 Regulatory Examination Preparation (Online)',
+    're5 face': 'RE 5 Regulatory Examination Preparation (Face-to-Face)',
+    're 5 face': 'RE 5 Regulatory Examination Preparation (Face-to-Face)',
+    'regulatory exam': 'RE 5 Regulatory Examination Preparation (Online)',
     'risk management': 'Risk Management Training Programme',
     'banking': 'National Certificate Banking NQF 5'
   };
@@ -792,6 +857,43 @@ Many of our students study while working and use their new qualification to adva
 ${intake.urgencyMessage}
 
 What field are you currently in, or what career are you aiming for? I can recommend the best course for your goals. 😊`;
+      } else if (/\b(re5|re 5|regulatory exam|fais|fsca)\b/.test(lower)) {
+        response = `Did you know the RE 5 Regulatory Examination is a **legal requirement** for anyone working in financial services in South Africa? Without it, you cannot legally operate in the industry. Don't let your career be held back!
+
+We have **two preparation options** — both completed within 6 weeks:
+
+💻 **Online Preparation — R1,000**
+• Face-to-face and online blended learning experience
+• Full coverage of all 10 RE 5 modules
+• Live facilitator-led training sessions
+• Access to experienced instructors throughout
+• Comprehensive study guides and practice examinations
+• Web pocket quick learning platform
+• Podcasts and revision support material
+• Pre-recorded video course explainers
+• Mock examinations under exam conditions
+• Topic-based questions and activities
+• 24/7 access to recorded sessions
+
+🏢 **Face-to-Face Preparation — R1,500**
+• **Includes everything the online learner gets**
+• Plus: Attends every Monday for 6 weeks at our headquarters
+• In-person instruction at 367 Surrey Avenue, Ground Floor, Block B, Randburg
+
+⚡ **This month's intakes:** 22nd and 29th — limited spaces available!
+
+📝 **What happens after training?**
+After your 6-week preparation with us, you'll book directly at **Moonstone** to write the official RE 5 exam. We prepare you thoroughly — Moonstone administers the exam. We'll guide you through the booking process.
+
+💳 **Payment:** Full upfront required (no instalments). Pay via EFT or at our office. No online e-commerce payments.
+
+🏦 **Banking Details:**
+Bank: FNB | Account Name: Cornerstone Supreme
+Account: 62653109283 | Branch: 261750 | SWIFT: FIRNZAJJ
+Reference: Your Name | Email proof to: info@cornerstonehr.co.za
+
+We've helped hundreds of candidates successfully pass their RE 5. Which option suits you better — online or face-to-face? 😊`;
+        ctx.stage = 'lead_collection';
       } else if (relevantCourse) {
         response = `${relevantCourse.title} is an excellent choice! Here's what you need to know:
 
@@ -820,6 +922,8 @@ Could you tell me a bit about what you're looking for? For example:
 - What field interests you?
 - Are you working and studying part-time?
 - What are your career goals?
+
+You can also browse our courses at www.cornerstonehr.co.za or access your study materials via our LMS at www.cornerstonehr.co.za/lms
 
 This will help me recommend the perfect course for you! 😊`;
         ctx.stage = 'needs_discovery';
