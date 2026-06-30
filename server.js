@@ -1346,3 +1346,303 @@ Our banking details for EFT or direct deposit:
 📝 Reference: Your Name
 
 Once you've paid, email your proof of payment to stephane@cornerstonehr.co.za
+${intake.urgencyMessage}
+
+Would you like me to help you choose a course, or do you have other questions? 😊`;
+      break;
+
+    case 'intake_dates':
+      response = `${intake.urgencyMessage}
+
+I'd really encourage you to register as soon as possible so we can secure your spot and get your study materials prepared. Would you like me to help you get the registration process started? 
+
+I can have our management team send you the registration form and invoice directly. Just share your full name, email, and which course you're interested in, and we'll take care of the rest! 😊`;
+      break;
+
+    case 'contact':
+      response = `You can reach us in a few ways:
+
+📱 WhatsApp: 0718374853
+☎️ Office Line: 087 152 0606
+📧 Email: stephane@cornerstonehr.co.za
+🌐 Website: https://www.cornerstonehr.co.za
+
+📍 Our Office:
+Cornerstone Supreme (Pty) Ltd
+367 Surrey Avenue, Block B
+Ground Floor, Ferdale
+Randburg, 2125
+Johannesburg
+
+Is there something specific I can help you with right now? 😊`;
+      break;
+
+    default:
+      if (/\b(pay|payment|installment|deposit|eft|transfer)\b/.test(lower)) {
+        response = `Most of our courses offer a **flexible deposit + monthly instalment plan** to make your investment manageable. Only the RE 5 Regulatory Examination Preparation requires full upfront payment.
+
+To give you the exact payment breakdown, could you let me know which course you're interested in? Each programme has its own specific deposit and instalment structure.
+
+Our banking details for any payment:
+🏦 Bank: FNB
+📋 Account Name: Cornerstone Supreme
+📋 Account Number: 62653109283
+📋 Branch Code: 261750
+📋 SWIFT Code: FIRNZAJJ (for international payments)
+📝 Reference: Your Name
+
+Send proof of payment to stephane@cornerstonehr.co.za
+
+Which course would you like the payment plan for? 😊`;
+      } else if (/\b(address|location|office|where are you|visit|physical|postal|direction)\b/.test(lower)) {
+        response = `Our office is located at:
+
+📍 Cornerstone Supreme (Pty) Ltd
+367 Surrey Avenue, Block B
+Ground Floor, Ferdale
+Randburg, 2125
+Johannesburg
+
+You can also reach us on:
+📱 WhatsApp: 0718374853
+☎️ Office: 087 152 0606
+📧 Email: stephane@cornerstonehr.co.za
+
+Would you like to book a visit or do you have questions about our courses?`;
+      } else if (/\b(requirement|need|matric|grade|qualification|entry requirement)\b/.test(lower)) {
+        response = `Most of our courses require a Matric certificate and basic computer literacy. For the NQF 5 and NQF 6 qualifications, work experience in the field is a plus but not always required.
+
+${intake.urgencyMessage}
+
+Which course are you interested in? I can tell you the specific requirements for that one, and we can check if you're a good fit. 😊`;
+      } else if (/\b(duration|how long|period|time)\b/.test(lower)) {
+        if (relevantCourse) {
+          response = `The ${relevantCourse.title} runs for ${relevantCourse.duration}. All sessions are conducted online via live virtual classes, so you can study from anywhere in South Africa with flexible scheduling.
+
+Recorded sessions are also available if you miss a live class, which is great if you're working while studying.
+
+${intake.urgencyMessage}
+
+Would you like to know about the payment options or registration process for this course?`;
+        } else {
+          response = `Our courses range from 3 weeks to 12 months:
+• Short Certificate Courses: 3 weeks – 3 months
+• Advanced Certificate Programmes: 6 months
+• National Certificates (NQF 5 & 6): 12 months
+
+All are online with flexible scheduling. ${intake.urgencyMessage} Which course would you like to know about?`;
+        }
+      } else if (/\b(cert|certificate|accredited|nqf|saqa|recognised|recognized)\b/.test(lower)) {
+        response = `Our programmes offer recognised certifications. Here's the breakdown:
+
+🏆 **National Certificate: Banking NQF 5** — Our ONLY BANKSETA-accredited programme (SAQA ID 20186, NQF Level 5, 120 credits). Certificate issued through BANKSETA.
+📜 **National Certificate: Financial Markets NQF 6** — SAQA-registered qualification (NQF Level 6) — NQF-aligned.
+🎓 **All other courses** — Professionally recognised short courses with Advanced Certificates. Valued by reputable organisations for skills development, though they do not carry NQF credits.
+
+After completion, you'll receive:
+🎓 Your official certificate
+📁 A skills portfolio
+📝 A reference letter (on request)
+
+${intake.urgencyMessage} Which course are you looking at?`;
+      } else if (/\b(job|work|career|employment|opportunity|salary|earn)\b/.test(lower)) {
+        response = `Great question! Our programmes are designed to open doors in the job market. For example:
+
+• **Banking NQF 5** → Commercial banks, lending institutions, regulatory departments
+• **Financial Markets NQF 6** → Investment firms, financial analysis, wealth management
+• **HR Management** → HR departments across all industries
+• **Medical Call Centre** → Healthcare administration, hospital call centres
+• **Business Administration** → Office management, operations, administration
+
+Many of our students study while working and use their new qualification to advance in their current role or switch careers.
+
+${intake.urgencyMessage}
+
+What field are you currently in, or what career are you aiming for? I can recommend the best course for your goals. 😊`;
+      } else if (/\b(re\s*1\b|rei|key individual|ki exam)\b/.test(lower) && !/\bre\s*5\b/.test(lower)) {
+        response = `The RE 1 is for **Key Individuals (KIs)** — those in management or supervisory roles who oversee a financial services practice. It's different from the RE 5, which is for Representatives who give financial advice to clients.
+
+At Cornerstone Supreme, we specialise in **RE 5 preparation** for representatives. For RE 1, I'd recommend speaking directly with our management team who can give you the most accurate guidance.
+
+You can reach them on:
+☎️ Office: 087 152 0606
+📧 Email: stephane@cornerstonehr.co.za
+
+Is there anything else about our RE 5 programme I can help you with? 😊`;
+      } else if (/\b(re5|re 5|regulatory exam|fais|fsca)\b/.test(lower)) {
+        response = `Did you know the RE 5 is a **legal requirement** for everyone in financial services in South Africa? Without it, you simply cannot work in the industry legally. Don't let your career be held back!
+
+We offer **two ways to prepare** for your RE 5 — both completed within 6 weeks:
+
+💻 **Online Learning — R1,000**
+Study from anywhere with live facilitator-led sessions, comprehensive study guides, mock exams, 24/7 recorded sessions, podcasts, video explainers, and full coverage of all 10 RE 5 modules.
+
+🏢 **Face-to-Face Learning — R1,500**
+Everything in the online programme PLUS you attend in-person sessions every Monday for 6 weeks at our Randburg office (367 Surrey Avenue, Ground Floor, Block B).
+
+**Which study method would you prefer — Online Learning or Face-to-Face Learning?** 😊`;
+        ctx.stage = 're5_method_selection';
+      } else if (ctx.stage === 're5_method_selection' && /\b(online|face|face-to-face|face to face)\b/.test(lower)) {
+        const method = /\b(face|face-to-face|face to face)\b/.test(lower) ? 'Face-to-Face' : 'Online';
+        const price = /\b(face|face-to-face|face to face)\b/.test(lower) ? 'R1,500' : 'R1,000';
+        response = `Great choice! The ${method} programme at ${price} is an excellent way to prepare. We've helped hundreds of candidates pass their RE 5 — you'll be in great hands!
+
+Now, we currently have available intakes starting on:
+📅 **22 June 2026**
+📅 **29 June 2026**
+
+Spaces are limited, so I recommend securing your spot quickly.
+
+**Which of these dates would you prefer to begin your RE5 programme — 22 June 2026 or 29 June 2026?** 😊`;
+        ctx.stage = 're5_date_selection';
+      } else if (ctx.stage === 're5_date_selection' && /\b(22|29|twenty|first|second|june)\b/.test(lower)) {
+const date = /\b(29|twenty-?nine)\b/.test(lower) ? '29 June 2026' : '22 June 2026';
+        response = `Perfect! I've noted **${date}** as your preferred start date. Let me get your registration sorted right away!
+
+To secure your spot, please complete your enrolment using this link: https://zjw4jz46ae4ok.kimi.page
+
+Once you've submitted the form, our management team will follow up with you via email and send you your Admission Letter, Invoice, and any additional documentation needed. Payment is required in full upfront before your start date — EFT or at our office only.
+
+Could you also share with me:
+• Your full name and surname
+• Your date of birth
+• Your email address
+• An alternative contact number
+
+This helps us prepare everything for you. And after you complete the 6-week training with us, we'll guide you through booking your official exam at Moonstone.
+
+Let's get you started — what's your full name and surname? 😊`;
+        ctx.stage = 'lead_collection';
+      } else if (relevantCourse) {
+        response = `${relevantCourse.title} is an excellent choice! Here's what you need to know:
+
+💰 Price: ${relevantCourse.price}
+⏱️ Duration: ${relevantCourse.duration}
+🎓 Certification: ${relevantCourse.certification}
+📍 Format: ${relevantCourse.format}
+
+${relevantCourse.description}
+
+${intake.urgencyMessage}
+
+Would you like me to help you get started with the registration? I just need a few details from you and our management team will send the registration form and invoice directly to you. 😊`;
+        ctx.stage = 'lead_collection';
+      } else if (/\b(other|another|else|what about|do you have|offer)\b/.test(lower) && lower.length < 50) {
+        response = `I'd be happy to help! Just to make sure I give you the most accurate information, could you tell me a bit more about what you're looking for?
+
+Here at Cornerstone Supreme, our main programmes are in:
+• 📊 Finance & Banking (including RE 5 exam prep)
+• 👔 Business & HR
+• 🏥 Healthcare & Safety
+
+If you're asking about something specific that I need to confirm, our management team will be happy to help:
+☎️ Office: 087 152 0606
+📧 Email: stephane@cornerstonehr.co.za
+
+What field are you interested in? 😊`;
+      } else {
+        response = `Thank you for your message! I'm Lerato from Cornerstone Supreme Education.
+
+I'd love to help you find the right course. We offer professional programmes in:
+• 📊 Finance & Banking
+• 👔 Business & HR
+• 🏥 Healthcare & Safety
+
+${intake.urgencyMessage}
+
+Could you tell me a bit about what you're looking for? For example:
+- What field interests you?
+- Are you working and studying part-time?
+- What are your career goals?
+
+You can also browse our courses at www.cornerstonehr.co.za or access your study materials via our LMS at www.cornerstonehr.co.za/lms
+
+This will help me recommend the perfect course for you! 😊`;
+        ctx.stage = 'needs_discovery';
+      }
+  }
+
+  updateContext(phone, intent, relevantCourse ? relevantCourse.title : courseInterest, studentMsg, response);
+  return { response, intent, lang };
+}
+
+// ============================================================
+// WHATSAPP API
+// ============================================================
+async function sendWhatsAppMessage(to, message) {
+  if (!API_KEY) { console.log('No API key configured'); return; }
+  try {
+    await fetch(`${WHATSAPP_API}/messages`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'D360-API-Key': API_KEY },
+      body: JSON.stringify({ messaging_product: 'whatsapp', recipient_type: 'individual', to, type: 'text', text: { body: message } })
+    });
+  } catch (err) {
+    console.error('Send error:', err.message);
+  }
+}
+
+function saveConversation(phone, name, studentMsg, leratoReply, intent, lang) {
+  let conv = DB.conversations.find(c => c.student_phone === phone);
+  if (!conv) {
+    conv = { id: nextId('conversations'), student_phone: phone, student_name: name, language: lang, status: 'active', intent, last_message: studentMsg.substring(0, 200), message_count: 1, created_at: new Date().toISOString(), updated_at: new Date().toISOString() };
+    DB.conversations.push(conv);
+  } else {
+    conv.last_message = studentMsg.substring(0, 200);
+    conv.intent = intent;
+    conv.message_count = (conv.message_count || 0) + 1;
+    conv.updated_at = new Date().toISOString();
+  }
+  DB.messages.push({ id: nextId('messages'), conversation_id: conv.id, sender: 'student', content: studentMsg, created_at: new Date().toISOString() });
+  DB.messages.push({ id: nextId('messages'), conversation_id: conv.id, sender: 'lerato', content: leratoReply, created_at: new Date().toISOString() });
+  saveDB();
+}
+
+// ============================================================
+// API ROUTES
+// ============================================================
+app.get('/api/ping', (req, res) => res.json(trpc({ ok: true, db: 'json-file', ai: OPENAI_API_KEY ? 'openai' : 'rule-based' })));
+
+app.post('/api/trpc/courses.list', (req, res) => {
+  const input = parseInput(req);
+  let result = DB.courses.filter(c => c.status === 'published');
+  if (input.category) result = result.filter(c => c.category === input.category);
+  if (input.search) result = result.filter(c => c.title.toLowerCase().includes(input.search.toLowerCase()));
+  res.json(trpc(result.reverse()));
+});
+
+app.post('/api/trpc/courses.count', (req, res) => res.json(trpc(DB.courses.filter(c => c.status === 'published').length)));
+
+app.post('/api/trpc/courses.create', (req, res) => {
+  const input = parseInput(req);
+  const course = { id: nextId('courses'), title: input.title, category: input.category, price: input.price, duration: input.duration, description: input.description, format: input.format || 'Online', certification: input.certification || 'Certificate of Completion', status: 'published', created_at: new Date().toISOString() };
+  DB.courses.push(course); saveDB();
+  res.json(trpc({ id: course.id }));
+});
+
+app.post('/api/trpc/students.list', (req, res) => {
+  const input = parseInput(req);
+  let result = [...DB.students];
+  if (input.status) result = result.filter(s => s.status === input.status);
+  res.json(trpc(result.reverse()));
+});
+
+app.post('/api/trpc/students.create', (req, res) => {
+  const input = parseInput(req);
+  const student = { id: nextId('students'), name: input.name, phone: input.phone, email: input.email || null, status: input.status || 'new', source: input.source || 'whatsapp', created_at: new Date().toISOString() };
+  DB.students.push(student); saveDB();
+  res.json(trpc({ id: student.id }));
+});
+
+app.post('/api/trpc/students.bulkImport', (req, res) => {
+  const input = parseInput(req);
+  let count = 0;
+  for (const s of (input.leads || [])) {
+    DB.students.push({ id: nextId('students'), name: s.name, phone: s.phone, email: s.email || null, status: s.status || 'interested', source: 'bulk_import', created_at: new Date().toISOString() });
+    count++;
+  }
+  saveDB();
+  res.json(trpc({ inserted: count, total: input.leads?.length || 0 }));
+});
+
+app.post('/api/trpc/conversations.list', (req, res) => {        
