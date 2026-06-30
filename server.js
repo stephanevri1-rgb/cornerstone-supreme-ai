@@ -1646,3 +1646,155 @@ app.post('/api/trpc/students.bulkImport', (req, res) => {
 });
 
 app.post('/api/trpc/conversations.list', (req, res) => {        
+
+
+res.json(trpc([...DB.conversations].sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at)).slice(0, 50)));
+});
+
+app.post('/api/trpc/messages.list', (req, res) => {
+  const input = parseInput(req);
+  res.json(trpc(DB.messages.filter(m => m.conversation_id === input.conversationId)));
+});
+
+app.post('/api/trpc/enrollments.list', (req, res) => res.json(trpc([...DB.enrollments].reverse())));
+
+app.post('/api/trpc/enrollments.create', (req, res) => {
+  const input = parseInput(req);
+  const enroll = { id: nextId('enrollments'), student_name: input.studentName, student_phone: input.studentPhone, course_name: input.courseName, amount: input.amount || '', status: input.status || 'pending', created_at: new Date().toISOString() };
+  DB.enrollments.push(enroll); saveDB();
+  res.json(trpc({ id: enroll.id }));
+});
+
+app.post('/api/trpc/brochures.list', (req, res) => {
+  res.json(trpc([...DB.brochures].reverse().map(b => ({ id: b.id, name: b.name, filename: b.filename, mime_type: b.mime_type, size: b.size, category: b.category, is_default: b.is_default, created_at: b.created_at }))));
+});
+
+app.post('/api/trpc/brochures.upload', (req, res) => {
+  const input = parseInput(req);
+  const isDefault = DB.brochures.length === 0 ? 1 : 0;
+  const brochure = { id: nextId('brochures'), name: input.name, filename: input.filename, mime_type: input.mimeType, size: input.size, data: input.data, category: input.category || 'General', is_default: isDefault, created_at: new Date().toISOString() };
+  DB.brochures.push(brochure); saveDB();
+  res.json(trpc({ id: brochure.id, isDefault: isDefault === 1 }));
+});
+
+app.post('/api/trpc/brochures.delete', (req, res) => {
+  const input = parseInput(req);
+  DB.brochures = DB.brochures.filter(b => b.id !== input.id);
+  saveDB();
+  res.json(trpc({ success: true }));
+});
+
+app.get('/api/brochures/:id', (req, res) => {
+  const b = DB.brochures.find(b => b.id === parseInt(req.params.id));
+  if (!b) return res.status(404).send('Not found');
+  const binary = Buffer.from(b.data, 'base64');
+  res.set('Content-Type', b.mime_type);
+  res.set('Content-Disposition', `inline; filename="${b.filename}"`);
+  res.send(binary);
+});
+
+// LEADS API
+app.post('/api/trpc/leads.list', (req, res) => {
+  res.json(trpc([...DB.leads].sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at))));
+});
+
+app.post('/api/trpc/leads.create', (req, res) => {
+  const input = parseInput(req);
+  const lead = {
+    id: nextId('leads'),
+    phone: input.phone || '',
+    leadInfo: input.leadInfo || {},
+    courseInterest: input.courseInterest || '',
+    status: input.status || 'qualified',
+    source: input.source || 'manual',
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  };
+  DB.leads.push(lead); saveDB();
+  res.json(trpc({ id: lead.id }));
+});
+
+app.post('/api/trpc/leads.updateStatus', (req, res) => {
+  const input = parseInput(req);
+  const lead = DB.leads.find(l => l.id === input.id);
+  if (lead) { lead.status = input.status; lead.updated_at = new Date().toISOString(); saveDB(); }
+  res.json(trpc({ success: true }));
+});
+
+app.post('/api/trpc/leads.clearAll', (req, res) => {
+  DB.leads = [];
+  saveDB();
+  res.json(trpc({ success: true, deleted: true }));
+});
+
+// SCREENSHOT UPLOAD ENDPOINTS
+app.post('/api/trpc/leads.uploadScreenshot', (req, res) => {
+  const input = parseInput(req);
+  const screenshot = {
+    id: nextId('screenshots'),
+    name: input.name,
+    filename: input.filename,
+    mime_type: input.mimeType,
+    size: input.size,
+    data: input.data,
+    created_at: new Date().toISOString()
+  };
+  DB.screenshots.push(screenshot);
+  saveDB();
+  res.json(trpc({ id: screenshot.id, success: true }));
+});
+
+app.post('/api/trpc/leads.listScreenshots', (req, res) => {
+  res.json(trpc([...DB.screenshots].reverse().map(s => ({
+    id: s.id,
+    name: s.name,
+    filename: s.filename,
+    mime_type: s.mime_type,
+    size: s.size,
+    created_at: s.created_at
+  }))));
+});
+
+app.post('/api/trpc/leads.deleteScreenshot', (req, res) => {
+  const input = parseInput(req);
+  DB.screenshots = DB.screenshots.filter(s => s.id !== input.id);
+  saveDB();
+  res.json(trpc({ success: true }));
+});
+
+app.get('/api/screenshots/:id', (req, res) => {
+  const s = DB.screenshots.find(s => s.id === parseInt(req.params.id));
+  if (!s) return res.status(404).send('Not found');
+  const binary = Buffer.from(s.data, 'base64');
+  res.set('Content-Type', s.mime_type);
+  res.set('Content-Disposition', `inline; filename="${s.filename}"`);
+  res.send(binary);
+});
+
+// CHAMILO LMS API ENDPOINTS
+app.post('/api/trpc/lms.status', async (req, res) => {
+  const apiKey = await chamiloGetApiKey();
+  const userName = chamiloSession.userProfile ? chamiloSession.userProfile.fullName : CHAMILO_USERNAME;
+  res.json(trpc({
+    authenticated: !!apiKey,
+    userName: userName,
+    userId: chamiloSession.userProfile ? chamiloSession.userProfile.id : null,
+    url: CHAMILO_API_URL ? CHAMILO_API_URL.replace(/\/+$/, '') : '',
+    username: CHAMILO_USERNAME || '',
+    lastError: chamiloSession.lastError || null
+  }));
+});
+
+app.post('/api/trpc/lms.getUserProfile', async (req, res) => {
+  const input = parseInput(req);
+  const result = await chamiloGetUserProfile(input.username);
+  res.json(trpc(result.error ? { error: result.message } : result.data));
+});
+
+app.post('/api/trpc/lms.getUserCourses', async (req, res) => {
+  const input = parseInput(req);
+  const result = await chamiloGetUserCourses(input.username);
+  res.json(trpc(result.error ? { error: result.message } : (result.data || [])));
+});
+
+app.post('/api/trpc/lms.getCourseDetails', async (req, res) => {         
