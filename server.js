@@ -1798,3 +1798,113 @@ app.post('/api/trpc/lms.getUserCourses', async (req, res) => {
 });
 
 app.post('/api/trpc/lms.getCourseDetails', async (req, res) => {         
+const input = parseInput(req);
+  const result = await chamiloGetCourseDetails(input.courseId);
+  res.json(trpc(result.error ? { error: result.message } : (result.data || {})));
+});
+
+app.post('/api/trpc/lms.getUserProgress', async (req, res) => {
+  const input = parseInput(req);
+  const result = await chamiloGetUserProgress(input.courseId, input.userId);
+  res.json(trpc(result.error ? { error: result.message } : (result.data || {})));
+});
+
+app.post('/api/trpc/lms.getUserGrades', async (req, res) => {
+  const input = parseInput(req);
+  const result = await chamiloGetUserGrades(input.courseId, input.userId);
+  res.json(trpc(result.error ? { error: result.message } : (result.data || {})));
+});
+
+app.post('/api/trpc/lms.getCourseExercises', async (req, res) => {
+  const input = parseInput(req);
+  const result = await chamiloGetCourseExercises(input.courseId);
+  res.json(trpc(result.error ? { error: result.message } : (result.data || [])));
+});
+
+app.post('/api/trpc/lms.getExerciseResults', async (req, res) => {
+  const input = parseInput(req);
+  const result = await chamiloGetExerciseResults(input.courseId, input.exerciseId, input.userId);
+  res.json(trpc(result.error ? { error: result.message } : (result.data || {})));
+});
+
+app.post('/api/trpc/company.getSettings', (req, res) => res.json(trpc(DB.settings)));
+app.post('/api/trpc/company.update', (req, res) => {
+  const input = parseInput(req);
+  for (const [key, value] of Object.entries(input)) {
+    if (value !== undefined) DB.settings[key] = value;
+  }
+  saveDB();
+  res.json(trpc({ success: true }));
+});
+
+app.post('/api/trpc/agents.list', (req, res) => {
+  res.json(trpc([
+    { agentId: 'intent_detector', name: 'Intent Detector', isActive: true },
+    { agentId: 'context_analyzer', name: 'Context Analyzer', isActive: true },
+    { agentId: 'sales_responder', name: 'Sales Advisor (Lerato)', isActive: true },
+    { agentId: 'objection_handler', name: 'Objection Handler', isActive: true },
+    { agentId: 'follow_up', name: 'Follow-up Agent', isActive: true },
+    { agentId: 'language_adapter', name: 'Language Adapter', isActive: true },
+    { agentId: 'post_enrollment', name: 'Student Success', isActive: true },
+    { agentId: 'prospector', name: 'Outbound Sales', isActive: true },
+  ]));
+});
+
+app.post('/api/trpc/analytics.getStats', (req, res) => {
+  res.json(trpc({
+    totalConversations: DB.conversations.length,
+    activeConversations: DB.conversations.filter(c => c.status === 'active').length,
+    enrolledCount: DB.conversations.filter(c => c.status === 'enrolled').length,
+    totalLeads: DB.leads.length,
+    conversionRate: DB.conversations.length > 0 ? ((DB.conversations.filter(c => c.status === 'enrolled').length / DB.conversations.length) * 100).toFixed(1) + '%' : '0%',
+  }));
+});
+
+// ---- WHATSAPP WEBHOOK ----
+app.get('/api/webhook/whatsapp', (req, res) => {
+  const mode = req.query['hub.mode'];
+  const token = req.query['hub.verify_token'];
+  const challenge = req.query['hub.challenge'];
+  if (mode === 'subscribe' && token === WEBHOOK_VERIFY_TOKEN) {
+    res.status(200).send(challenge);
+  } else {
+    res.sendStatus(403);
+  }
+});
+
+app.post('/api/webhook/whatsapp', async (req, res) => {
+  res.sendStatus(200);
+  try {
+    const messages = req.body?.entry?.[0]?.changes?.[0]?.value?.messages;
+    if (!messages || messages.length === 0) return;
+    const msg = messages[0];
+    const from = msg.from;
+    const text = msg.text?.body || '';
+    const name = msg.contacts?.[0]?.profile?.name || 'Student';
+    console.log(`[IN] ${from}: ${text}`);
+    const { response, intent, lang } = await generateAIResponse(text, from);
+    saveConversation(from, name, text, response, intent, lang);
+    await sendWhatsAppMessage(from, response);
+    console.log(`[OUT] ${from}: ${response.substring(0, 80)}...`);
+  } catch (err) {
+    console.error('Webhook error:', err.message);
+  }
+});
+
+// STATIC FILES
+const publicPath = path.join(__dirname, 'public');
+app.use(express.static(publicPath));
+app.get('*', (req, res) => res.sendFile(path.join(publicPath, 'index.html')));
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log('='.repeat(60));
+  console.log('  Cornerstone Supreme AI - Lerato is LIVE');
+  console.log('  AI Mode:', OPENAI_API_KEY ? 'GPT-4o Mini (Smart)' : 'Rule-Based');
+  console.log('  Port:', PORT);
+  console.log('  Courses:', DB.courses.length);
+  console.log('  Chamilo LMS:', CHAMILO_API_URL ? 'Configured (' + CHAMILO_API_URL + ')' : 'Not configured');
+  console.log('  Chamilo Auth:', CHAMILO_USERNAME ? 'Using ' + CHAMILO_USERNAME : 'No credentials');
+  console.log('  WhatsApp: /api/webhook/whatsapp');
+  console.log('='.repeat(60));
+});
