@@ -1,4 +1,3 @@
-=== START CHUNK 1 ===
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
@@ -48,6 +47,25 @@ function createDefaultDB() {
     screenshots: [],
     settings: {
       companyName: 'Cornerstone Supreme Education',
+  === START CHUNK 2 ===
+      { id: 6, title: 'Medical Call Centre Training', category: 'Healthcare', price: 'R3,500', duration: '3 months', description: 'Equips individuals with skills to effectively handle calls and inquiries in a healthcare setting. Covers medical terminology, communication skills, confidentiality, emergency management, call management, and legal & ethical obligations. Professionally recognised short course — does not carry NQF credits.', format: 'Online', certification: 'Certificate', status: 'published' },
+      { id: 7, title: 'National Certificate Financial Markets and Instruments NQF 6', category: 'Finance', price: 'R22,000', duration: '12 months', description: 'One-year online qualification (SAQA ID: 50481, 120 Credits, NQF Level 6). Develops competent professionals who can analyse and make informed decisions in the financial landscape. Covers investment decisions, company analysis, debt market, market trends, cash flow analysis, and risk management. NQF-aligned qualification — NOT BANKSETA-accredited.', format: 'Online', certification: 'National Certificate NQF 6', status: 'published' },
+      { id: 8, title: 'Online Advanced Business Administration', category: 'Business', price: 'R4,500', duration: '6 months', description: 'Teaches essential administrative duties, business operations, processes, and customer service basics. 15 modules spanning leadership, finance, technology, and core business skills. Advanced Certificate. Professionally recognised short course — does not carry NQF credits.', format: 'Online', certification: 'Advanced Certificate', status: 'published' },
+      { id: 9, title: 'Professional Receptionist Online Short Course', category: 'Business', price: 'R4,500', duration: '6 months', description: 'Launch your career in business administration, customer service, and office management. 16 comprehensive modules including business foundations, communication & relations, service & marketing, and Microsoft Office Suite. Advanced Certificate. Professionally recognised short course — does not carry NQF credits.', format: 'Online', certification: 'Advanced Certificate', status: 'published' },
+      { id: 10, title: 'RE 5 Regulatory Examination Preparation (Online)', category: 'Finance', price: 'R1,000', duration: '6 weeks', description: 'Online preparation for the RE 5 Regulatory Examination, mandatory for financial services providers in South Africa. Covers all 10 RE 5 modules via live facilitator-led sessions. Full upfront payment required. This is an exam preparation course — it does NOT carry NQF credits. Upon completion, you must book and write the RE 5 exam independently at Moonstone.', format: 'Online', certification: 'Certificate of Completion', status: 'published' },
+      { id: 13, title: 'RE 5 Regulatory Examination Preparation (Face-to-Face)', category: 'Finance', price: 'R1,500', duration: '6 weeks', description: 'Face-to-face preparation for the RE 5 Regulatory Examination at our Randburg headquarters. Attends every Monday for 6 weeks. Includes everything from the online programme plus in-person instruction. Full upfront payment required. This is an exam preparation course — it does NOT carry NQF credits. Upon completion, you must book and write the RE 5 exam independently at Moonstone.', format: 'Face-to-Face', certification: 'Certificate of Completion', status: 'published' },
+      { id: 11, title: 'Risk Management Training Programme', category: 'Business', price: 'R6,000', duration: '3 weeks', description: 'Aligned to SAQA ID 252025. Prepares you to identify, assess, and manage risk within your unit. Grounded in ISO 31000 and COSO internationally recognised standards. Certificate of Competence. Professionally recognised short course — does not carry NQF credits.', format: 'Online & Face-to-Face', certification: 'Certificate of Competence', status: 'published' },
+      { id: 12, title: 'National Certificate Banking NQF 5', category: 'Banking', price: 'R12,000', duration: '12 months', description: '120-credit qualification (SAQA ID: 20186, NQF Level 5). Gateway to commercial banks, consumer lending institutions, cooperative financial organizations, and government regulatory departments. Six core modules. This is the ONLY BANKSETA-accredited programme we offer. Certificate issued through BANKSETA after external moderation.', format: 'Online', certification: 'National Certificate NQF 5', status: 'published' }
+    ],
+    students: [],
+    conversations: [],
+    messages: [],
+    enrollments: [],
+    brochures: [],
+    leads: [],
+    screenshots: [],
+    settings: {
+      companyName: 'Cornerstone Supreme Education',
       companyPhone: '0718374853',
       officePhone: '087 152 0606',
       companyWebsite: 'https://www.cornerstonehr.co.za',
@@ -64,40 +82,6 @@ function createDefaultDB() {
   };
 }
 
-const DB = loadDB();
-
-function nextId(table) {
-  if (!DB._nextId[table]) DB._nextId[table] = 1;
-  return DB._nextId[table]++;
-}
-
-process.on('exit', () => saveDB());
-process.on('SIGINT', () => { saveDB(); process.exit(0); });
-process.on('SIGTERM', () => { saveDB(); process.exit(0); });
-setInterval(saveDB, 30000);
-
-console.log('Database loaded. Courses:', DB.courses.length);
-function extractLeadInfo(phone, message) {
-  const ctx = getContext(phone);
-  if (!ctx.lead_info) ctx.lead_info = {};
-  
-  const namePatterns = [
-    /(?:my name is|i am|i'm|call me|this is)\s+([A-Za-z\s]+?)(?:\.|,|$|\n|\d)/i,
-    /(?:full name|name and surname)\s*:?\s*([A-Za-z\s]+?)(?:\.|,|$|\n|\d)/i
-  ];
-  for (const p of namePatterns) {
-    const m = message.match(p);
-    if (m && m[1] && m[1].trim().length > 2) { ctx.lead_info.fullName = m[1].trim(); break; }
-  }
-  
-  const emailMatch = message.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
-  if (emailMatch) ctx.lead_info.email = emailMatch[0];
-  
-  const phonePatterns = [
-    /(?:alternative|other|contact|cell|phone|number|reach me).*?(?:is|:)?\s*(\d[\d\s]{8,})/i,
-    /(?:\+?27|0)[\s\d]{9,}/
-  ];
-  for (const p of phonePatterns) {
     const m = message.match(p);
     if (m) {
       const num = m[1] || m[0];
