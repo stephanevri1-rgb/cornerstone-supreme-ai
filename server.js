@@ -898,4 +898,303 @@ LeratoAI is enrolled in the National Certificate Banking NQF 5 programme. Here a
 
 ### MODULE 2: BANKING SALES
 - **Course Code:** BSCOR1 
+- Covers banking sales principles, techniques, and customer engagement in the banking sector
+- **Assessments:**
+  - Formative Assessment MODULE 2 (OPEN BOOK) — marked by Sarojini
+  - Summative Assessment MODULE 2 (CLOSED BOOK) — marked by Sarojini
+  - Revision Package with TEST for each session — AI-marked by Chamilo (results immediate)
 
+### MODULE 3: ADDRESSING CLIENT'S NEEDS
+- **Course Code:** MODULE3ADDRESSINGCLIENTSNEEDS
+- Focuses on understanding client needs, financial planning advice, and customer relationship management
+- **Assessments:**
+  - Formative Assessment MODULE 3 (OPEN BOOK) — marked by Sarojini
+  - Summative Assessment MODULE 3 (CLOSED BOOK) — marked by Sarojini
+  - Revision Package with TEST for each session — AI-marked by Chamilo (results immediate)
+
+### MODULE 4: BANKING TRANSACTIONS
+- **Course Code:** MODULE4BANKINGTRANSACTIONS
+- Covers day-to-day banking transactions, payment systems, and operational procedures
+- **Assessments:**
+  - Formative Assessment MODULE 4 (OPEN BOOK) — marked by Sarojini
+  - Summative Assessment MODULE 4 (CLOSED BOOK) — marked by Sarojini
+  - Revision Package with TEST for each session — AI-marked by Chamilo (results immediate)
+
+### MODULE 5: BUSINESS BANKING
+- **Course Code:** MODULE5BUSINESSBANKING
+- Focuses on business banking products, services for SME and corporate clients
+- **Assessments:**
+  - Formative Assessment MODULE 5 (OPEN BOOK) — marked by Sarojini
+  - Summative Assessment MODULE 5 (CLOSED BOOK) — marked by Sarojini
+  - Revision Package with TEST for each session — AI-marked by Chamilo (results immediate)
+
+### MODULE 6: MORTGAGE LOANS
+- **Course Code:** MODULE6MORTGAGELOANS
+- Covers mortgage lending principles, property finance, home loan products and regulations
+- **Assessments:**
+  - Formative Assessment MODULE 6 (OPEN BOOK) — marked by Sarojini
+  - Summative Assessment MODULE 6 (CLOSED BOOK) — marked by Sarojini
+  - Revision Package with TEST for each session — AI-marked by Chamilo (results immediate)
+
+### HOW THE ASSESSMENT FLOW WORKS IN EACH MODULE:
+1. **Study the Learning Path** — Go through sessions 1-3, listen to audio materials, study content
+2. **Complete Revision Package** — Write the AI-marked TEST after each session. Results are immediate.
+3. **Complete Formative Assessment** — OPEN BOOK assessment. Submit via Learner Declaration. Marked by Sarojini (3-5 working days).
+4. **Complete Summative Assessment** — CLOSED BOOK assessment. Submit via Learner Declaration. Marked by Sarojini (3-5 working days).
+5. **Download Declaration Forms** — From the course page or Learning Path
+
+### TRAINERS FOR BANKING NQF 5:
+- KORE DANIELLE SALEME FLAN
+- SAROJINI NAIDOO (Assessor)
+- SIMELOKUHLE SILALA
+- ESTHER MKANDAWIRE
+- GUEYASSER STEPHANE VRI (Administrator)
+
+## GENERAL INFO
+- All courses are online via live virtual sessions (except RE 5 Face-to-Face which is at our Randburg office)
+- Study from anywhere in South Africa
+- Requirements: Matric certificate + basic computer literacy
+- Recorded sessions available for revision
+- Website: www.cornerstonehr.co.za
+- LMS Access (for study materials): www.cornerstonehr.co.za/lms or www.cornerstonehr.co.za/learn
+
+## ACCREDITATION STATUS — CRITICAL: GET THIS RIGHT
+- **National Certificate Banking NQF 5** — This is the ONLY BANKSETA-accredited programme we offer. It has SAQA ID 20186, NQF Level 5, 120 credits. The certificate is issued through BANKSETA after external moderation.
+- **National Certificate Financial Markets NQF 6** — This is an NQF Level 6 qualification (SAQA ID: 50481, 120 Credits). NQF-aligned but NOT BANKSETA-accredited.
+- **ALL OTHER COURSES** (Entrepreneurship, Health & Safety, HR Management, Logistics, Medical Call Centre, Business Administration, Professional Receptionist, Risk Management, RE 5 Preparation) — These are SHORT COURSES. They do NOT carry NQF credits and are NOT BANKSETA-accredited. They ARE professionally recognised and valued by many reputable organisations for skills development and professional growth.
+- **RE 5 Preparation** — This is an EXAM PREPARATION course, not a qualification. It prepares you to write the RE 5 exam at Moonstone. It does NOT carry NQF credits.
+- **WHEN A PROSPECT ASKS "Are your courses accredited?"** — Be honest and specific: "Our National Certificate: Banking NQF 5 is BANKSETA-accredited. Our other programmes are professionally recognised short courses that are valued by reputable organisations for skills development."
+- **NEVER** say all courses are BANKSETA-accredited
+- **NEVER** claim short courses carry NQF credits
+- **NEVER** mislead about the accreditation or qualification status of any programme
+
+## ACCURACY RULES — NEVER PROVIDE INCORRECT INFORMATION
+- If you do not know the answer to a question, say "Let me check that for you" or "I'll get our management team to confirm that" — NEVER guess or make up information
+- If asked about a course or programme Cornerstone Supreme does NOT offer, say "We don't currently offer that programme, but let me tell you about what we do have" — do not invent courses
+- If asked about something outside your knowledge (e.g., RE1, other companies' courses, industry regulations you don't know), say "I'd recommend speaking directly with our management team for the most accurate information on that. You can reach them on 087 152 0606 or stephane@cornerstonehr.co.za" — NEVER guess
+
+## CONVERSATION RULES
+- ALWAYS follow the Sales Framework: Greet → Intro → Needs Discovery → Assist → Question-Based Selling → Lead Qualification → Close
+- If the student asks about a specific course, give details AND ask a follow-up question
+- If they ask about pricing, give the price AND mention payment options
+- If they ask about duration, give it AND mention the format
+- If they ask about next intake, present the CURRENT intake with urgency. Encourage immediate registration
+- If they're interested, move naturally to collecting their details (Lead Qualification)
+- Don't overwhelm with info — answer what they asked, then ask what else they want to know
+- Always be persuasive, helpful, and client-focused`;
+}
+
+async function generateAIResponse(studentMsg, phone) {
+  const ctx = getContext(phone);
+  const detectedCourse = extractCourseMention(studentMsg);
+  const isRE5 = detectedCourse && detectedCourse.toLowerCase().includes('re 5');
+  const ctxHasRE5 = ctx.course_interest && ctx.course_interest.toLowerCase().includes('re 5');
+  const historyHasRE5 = ctx.message_history && ctx.message_history.some(m => 
+    m.msg && /\b(re\s*5|re5|regulatory exam)\b/.test(m.msg.toLowerCase())
+  );
+  const isRE5Conversation = isRE5 || ctxHasRE5 || historyHasRE5;
+  const studentAsksForLink = /\b(link|form|register|enrol|enroll|sign up|application|enrolment form|registration form)\b/.test(studentMsg.toLowerCase());
+  
+  const messages = [{ role: 'system', content: buildSystemPrompt() }];
+  
+  const recentHistory = ctx.message_history.slice(-10);
+  for (const msg of recentHistory) {
+    messages.push({ role: msg.role === 'student' ? 'user' : 'assistant', content: msg.msg });
+  }
+  
+  messages.push({ role: 'user', content: studentMsg });
+  
+  const leadInfo = extractLeadInfo(phone, studentMsg);
+  const courseInterest = extractCourseMention(studentMsg);
+  if (leadInfo.fullName && (leadInfo.email || leadInfo.altPhone)) {
+    saveLead(phone, leadInfo, courseInterest);
+  }
+  
+  if (!OPENAI_API_KEY) return fallbackResponse(studentMsg, phone);
+  
+  try {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${OPENAI_API_KEY}` },
+      body: JSON.stringify({ model: 'gpt-4o-mini', messages, temperature: 0.7, max_tokens: 500 })
+    });
+    
+    if (!response.ok) {
+      console.error('OpenAI error:', response.status);
+      return fallbackResponse(studentMsg, phone);
+    }
+    
+    const data = await response.json();
+    let aiReply = data.choices?.[0]?.message?.content?.trim();
+    if (!aiReply) return fallbackResponse(studentMsg, phone);
+    
+    // POST-PROCESSING SAFETY NET: If pre-AI check missed it, catch link denials here
+    const aiDeniedLink = /\b(not available|cannot provide|don't have|do not have|can't share|cannot share|unable to|not accessible|unfortunately|no.*form|don't.*form|do not.*form)\b/.test(aiReply.toLowerCase());
+    const aiHasLink = aiReply.includes('zjw4jz46ae4ok');
+    if (aiDeniedLink || !aiHasLink) {
+      // Check if ANY previous message in history mentions RE 5
+      const historyHasRE5Anywhere = ctx.message_history && ctx.message_history.some(m => 
+        m.msg && /\b(re\s*5|re5|regulatory exam)\b/.test(m.msg.toLowerCase())
+      );
+      if (historyHasRE5Anywhere && studentAsksForLink) {
+        console.log('RE5 SAFETY NET: Replacing AI response with link.');
+        aiReply = `Of course! Here is your RE 5 enrolment form:
+
+https://zjw4jz46ae4ok.kimi.page
+
+Please complete the form to secure your place. Once you've submitted it, our management team will follow up with you via email and send you:
+📋 Your Admission Letter
+🧾 The Invoice  
+📎 Any additional documentation needed
+
+Payment must be made in full upfront before the starting day. Is there anything else I can help you with? 😊`;
+}
+    }
+    
+    const intent = detectIntent(studentMsg);
+    const lang = detectLanguage(studentMsg);
+    updateContext(phone, intent, detectedCourse, studentMsg, aiReply);
+    return { response: aiReply, intent, lang };
+    
+  } catch (err) {
+    console.error('OpenAI error:', err.message);
+    return fallbackResponse(studentMsg, phone);
+  }
+}
+
+function detectIntent(msg) {
+  const lower = msg.toLowerCase();
+  if (/\b(hi|hello|hey|sawubona|hallo|good morning|good afternoon|good evening)\b/.test(lower)) return 'greeting';
+  if (/\b(price|cost|how much|fee|r\d|rand)\b/.test(lower)) return 'pricing';
+  if (/\b(payment|pay|installment|deposit|eft|transfer|banking details|bank details)\b/.test(lower) && !/\b(enroll|register|sign up|apply)\b/.test(lower)) return 'payment_details';
+  if (/\b(enroll|register|sign up|apply|registration)\b/.test(lower)) return 'enrollment';
+  if (/\b(brochure|catalog|pdf|send me|download)\b/.test(lower)) return 'brochure';
+  if (/\b(course|learn|study|training|qualification|programme)\b/.test(lower)) return 'courses';
+  if (/\b(thank|thanks)\b/.test(lower)) return 'thanks';
+  if (/\b(bye|goodbye)\b/.test(lower)) return 'goodbye';
+  if (/\b(my name is|i am|i'm|call me|full name|surname|date of birth|dob|email|alternative number|contact number|you can reach me)\b/.test(lower)) return 'lead_info';
+  if (/\b(intake|start date|when does it start|next class|begin|commence)\b/.test(lower)) return 'intake_dates';
+  if (/\b(contact|phone|number|call|reach|office)\b/.test(lower)) return 'contact';
+  return 'general';
+}
+
+function detectLanguage(msg) {
+  const lower = msg.toLowerCase();
+  if (/\b(dankie|hoeveel|kursus|leer|ja|nee|goeie|more|middag)\b/.test(lower)) return 'af';
+  if (/\b(ngiyabonga|kanjani|isifundo|funda|yebo|cha|sawubona|sanibonani)\b/.test(lower)) return 'zu';
+  return 'en';
+}
+
+function extractCourseMention(msg) {
+  const lower = msg.toLowerCase();
+  for (const c of DB.courses) {
+    if (lower.includes(c.title.toLowerCase())) return c.title;
+  }
+  const keywords = {
+    'entrepreneurship': 'Entrepreneurship Training Online Short Course',
+    'hr': 'Human Resources Management',
+    'human resource': 'Human Resources Management',
+    'health and safety': 'Health and Safety in the Workplace',
+    'logistics': 'Logistics and Supply Chain Management',
+    'supply chain': 'Logistics and Supply Chain Management',
+    'medical call': 'Medical Call Centre Training',
+    'call centre': 'Medical Call Centre Training',
+    'financial markets': 'National Certificate Financial Markets and Instruments NQF 6',
+    'business admin': 'Online Advanced Business Administration',
+    'receptionist': 'Professional Receptionist Online Short Course',
+    're 5': 'RE 5 Regulatory Examination Preparation (Online)',
+    're5': 'RE 5 Regulatory Examination Preparation (Online)',
+    're5 online': 'RE 5 Regulatory Examination Preparation (Online)',
+    're5 face': 'RE 5 Regulatory Examination Preparation (Face-to-Face)',
+    're 5 face': 'RE 5 Regulatory Examination Preparation (Face-to-Face)',
+    'regulatory exam': 'RE 5 Regulatory Examination Preparation (Online)',
+    'risk management': 'Risk Management Training Programme',
+    'banking': 'National Certificate Banking NQF 5'
+  };
+  for (const [kw, course] of Object.entries(keywords)) {
+    if (lower.includes(kw)) return course;
+  }
+  return '';
+}
+
+// ============================================================
+// FALLBACK RESPONSES — Consultative Sales Framework
+// ============================================================
+function fallbackResponse(studentMsg, phone) {
+  const lower = studentMsg.toLowerCase().trim();
+  const lang = detectLanguage(studentMsg);
+  const ctx = getContext(phone);
+  const relevantCourse = getCourseByTitle(studentMsg);
+  const intent = detectIntent(studentMsg);
+  const courseInterest = extractCourseMention(studentMsg);
+  const intake = getIntakeInfo();
+  const leadInfo = extractLeadInfo(phone, studentMsg);
+  let response = '';
+
+  switch(intent) {
+    case 'greeting':
+      response = `Hello there! 👋 Welcome to Cornerstone Supreme Education.
+
+My name is Lerato, and I'm a course advisor here. It's lovely to hear from you!
+
+May I ask what brings you to us today? Are you looking to upskill in your current field, start a new career, or perhaps explore professional qualifications? I'd love to help you find the right path. 😊`;
+      ctx.stage = 'needs_discovery';
+      break;
+
+    case 'thanks':
+      response = `You're very welcome! It's been a pleasure chatting with you. 
+
+If you think of any other questions, just send me a message — I'm always here to help. Have a wonderful day! 🌟`;
+      break;
+
+    case 'goodbye':
+      response = `Goodbye for now! Thank you for considering Cornerstone Supreme Education. 
+
+Feel free to reach out on WhatsApp (0718374853) or give our office a call on 087 152 0606 whenever you're ready. Take care! 👋`;
+      break;
+
+    case 'lead_info':
+      if (leadInfo.fullName || leadInfo.email || leadInfo.altPhone || leadInfo.dateOfBirth) {
+        saveLead(phone, leadInfo, courseInterest);
+        const missing = [];
+        if (!leadInfo.fullName) missing.push('your full name and surname');
+        if (!leadInfo.dateOfBirth) missing.push('your date of birth');
+        if (!leadInfo.email) missing.push('your email address');
+        if (!leadInfo.altPhone) missing.push('an alternative contact number');
+        
+        if (missing.length === 0) {
+          const isRE5Interest = courseInterest && courseInterest.toLowerCase().includes('re 5');
+          if (isRE5Interest) {
+            response = `Perfect! Thank you so much for providing all your details, ${leadInfo.fullName || 'there'}! 
+
+To secure your place for the RE 5 programme, please complete your enrolment right now using this link: https://zjw4jz46ae4ok.kimi.page
+
+Once you've submitted the form, our management team will follow up with you via email and send you your Admission Letter, Invoice, and any additional documentation needed. Payment must be made in full upfront before the starting day.
+
+In the meantime, do you have any other questions I can help you with? 😊`;
+          } else {
+            response = `Perfect! Thank you so much for providing all your details, ${leadInfo.fullName || 'there'}. 
+
+I'll pass everything along to our management team right away, and they will send you:
+📋 The Registration Form
+🧾 The Invoice  
+📎 Any additional enrolment documentation you need
+
+This will be sent to ${leadInfo.email || 'your email'} shortly. In the meantime, do you have any other questions I can help you with? 😊`;
+          }
+          ctx.stage = 'closed';
+        } else if (missing.length <= 2 && (leadInfo.fullName && leadInfo.email)) {
+          response = `Thank you, ${leadInfo.fullName}! I have most of your details. Just to complete everything, could you also share ${missing.join(' and ')}?
+
+Once I have that, our management team will send your registration form and invoice directly to you.`;
+        } else {
+          response = `Thank you for that! To get your registration processed smoothly, could you also share ${missing.join(', ')}?
+
+This helps our management team prepare your registration pack with everything you need.`;
+        }
+      } else {
+        response = `Thank you for getting in touch! To help me assist you better, could you share a bit more about yourself?
+
+• Your full name and surname
+• What field or career you're interested in
+• Whether you're looking to study online while working        
