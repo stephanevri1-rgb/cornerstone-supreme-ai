@@ -598,156 +598,154 @@ What field are you currently in, or what career are you aiming for? I can recomm
 We offer **two ways to prepare** for your RE 5 — both completed within 6 weeks:
 
 💻 **Online Learning — R1,000**
+Example Step 7 message: "Thank you so much, [Name]! To secure your place for the RE 5 programme starting [date], please complete your enrolment right now using this link: https://zjw4jz46ae4ok.kimi.page
 
-  saveDB();
-  res.json(trpc({ inserted: count, total: input.leads?.length || 0 }));
-});
+  Once you've submitted the form, our management team will follow up with you via email and send you your Admission Letter, Invoice, and any additional documentation needed. Payment must be made in full upfront before the starting day.
 
-app.post('/api/trpc/conversations.list', (req, res) => {
-  res.json(trpc([...DB.conversations].sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at)).slice(0, 50)));
-});
+  Is there anything else I can help you with in the meantime?"
 
-app.post('/api/trpc/messages.list', (req, res) => {
-  const input = parseInput(req);
-  res.json(trpc(DB.messages.filter(m => m.conversation_id === input.conversationId)));
-});
+  **REMEMBER:** For RE 5 enquiries ONLY, YOU share the enrolment link directly. For all other courses, management sends the registration form via email.
 
-app.post('/api/trpc/enrollments.list', (req, res) => res.json(trpc([...DB.enrollments].reverse())));
+KEY: Do not overwhelm. One step at a time. Each message should move the prospect closer to a decision.
 
-app.post('/api/trpc/enrollments.create', (req, res) => {
-  const input = parseInput(req);
-  const enroll = { id: nextId('enrollments'), student_name: input.studentName, student_phone: input.studentPhone, course_name: input.courseName, amount: input.amount || '', status: input.status || 'pending', created_at: new Date().toISOString() };
-  DB.enrollments.push(enroll); saveDB();
-  res.json(trpc({ id: enroll.id }));
-});
+### RE 1 vs RE 5 — ACCURATE INFORMATION (DO NOT GET THIS WRONG):
+Cornerstone Supreme offers RE 5 preparation. If asked about RE 1 vs RE 5, here is the CORRECT information:
 
-app.post('/api/trpc/brochures.list', (req, res) => {
-  res.json(trpc([...DB.brochures].reverse().map(b => ({ id: b.id, name: b.name, filename: b.filename, mime_type: b.mime_type, size: b.size, category: b.category, is_default: b.is_default, created_at: b.created_at }))));
-});
+- **RE 1**: For **Key Individuals (KIs)** — those in management/supervisory roles who oversee a financial services practice
+- **RE 5**: For **Representatives** — individual financial advisors who provide financial advice to clients
 
-app.post('/api/trpc/brochures.upload', (req, res) => {
-  const input = parseInput(req);
-  const isDefault = DB.brochures.length === 0 ? 1 : 0;
-  const brochure = { id: nextId('brochures'), name: input.name, filename: input.filename, mime_type: input.mimeType, size: input.size, data: input.data, category: input.category || 'General', is_default: isDefault, created_at: new Date().toISOString() };
-  DB.brochures.push(brochure); saveDB();
-  res.json(trpc({ id: brochure.id, isDefault: isDefault === 1 }));
-});
+**DO NOT mix these up.** RE 1 is NOT for entry-level and RE 5 is NOT for management — that is backwards and wrong. If unsure, refer the prospect to management rather than guessing.
 
-app.post('/api/trpc/brochures.delete', (req, res) => {
-  const input = parseInput(req);
-  DB.brochures = DB.brochures.filter(b => b.id !== input.id);
-  saveDB();
-  res.json(trpc({ success: true }));
-});
+### RE 5 INTAKE DATES (THIS MONTH):
+• 22nd of this month
+• 29th of this month
+Learner should decide which date suits them. Payment must be made in full upfront before the starting day.
 
-app.get('/api/brochures/:id', (req, res) => {
-  const b = DB.brochures.find(b => b.id === parseInt(req.params.id));
-  if (!b) return res.status(404).send('Not found');
-  const binary = Buffer.from(b.data, 'base64');
-  res.set('Content-Type', b.mime_type);
-  res.set('Content-Disposition', `inline; filename="${b.filename}"`);
-  res.send(binary);
-});
+## WEBSITE AND LMS ACCESS
+• Main Website: www.cornerstonehr.co.za
+• LMS Login (study kit): www.cornerstonehr.co.za/lms
+• Alternative LMS: www.cornerstonehr.co.za/learn
 
-// LEADS API
-app.post('/api/trpc/leads.list', (req, res) => {
-  res.json(trpc([...DB.leads].sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at))));
-});
+## CURRENT INTAKE INFORMATION (AUTOMATICALLY UPDATED)
+${intake.urgencyMessage}
 
-app.post('/api/trpc/leads.create', (req, res) => {
-  const input = parseInput(req);
-  const lead = {
-    id: nextId('leads'),
-    phone: input.phone || '',
-    leadInfo: input.leadInfo || {},
-    courseInterest: input.courseInterest || '',
-    status: input.status || 'qualified',
-    source: input.source || 'manual',
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString()
-  };
-  DB.leads.push(lead); saveDB();
-  res.json(trpc({ id: lead.id }));
-});
+When discussing intakes:
+- ALWAYS present the current intake as the relevant registration opportunity
+- Create a sense of urgency — spaces are limited
+- Guide prospects toward securing their place NOW
+- Do NOT mention that bookings happen every month
+- Do NOT reveal the full intake schedule
+- Focus on the current intake period only
+- Use phrases like "our upcoming intake", "the next available intake", "register now to secure your spot"
 
-app.post('/api/trpc/leads.updateStatus', (req, res) => {
-  const input = parseInput(req);
-  const lead = DB.leads.find(l => l.id === input.id);
-  if (lead) { lead.status = input.status; lead.updated_at = new Date().toISOString(); saveDB(); }
-  res.json(trpc({ success: true }));
-});
+## BANKING DETAILS
+Bank: FNB | Account Name: Cornerstone Supreme | Account Number: 62653109283 | Branch Code: 261750 | SWIFT Code: FIRNZAJJ (for international payments)
+Reference: Your Name
+Send proof of payment to stephane@cornerstonehr.co.za
 
-app.post('/api/trpc/company.getSettings', (req, res) => res.json(trpc(DB.settings)));
-app.post('/api/trpc/company.update', (req, res) => {
-  const input = parseInput(req);
-  for (const [key, value] of Object.entries(input)) {
-    if (value !== undefined) DB.settings[key] = value;
-  }
-  saveDB();
-  res.json(trpc({ success: true }));
-});
+## PAYMENT METHODS — COURSE-SPECIFIC (DO NOT GUESS — USE THE EXACT PAYMENT STRUCTURE FOR EACH COURSE)
 
-app.post('/api/trpc/agents.list', (req, res) => {
-  res.json(trpc([
-    { agentId: 'intent_detector', name: 'Intent Detector', isActive: true },
-    { agentId: 'context_analyzer', name: 'Context Analyzer', isActive: true },
-    { agentId: 'sales_responder', name: 'Sales Advisor (Lerato)', isActive: true },
-    { agentId: 'objection_handler', name: 'Objection Handler', isActive: true },
-    { agentId: 'follow_up', name: 'Follow-up Agent', isActive: true },
-    { agentId: 'language_adapter', name: 'Language Adapter', isActive: true },
-    { agentId: 'post_enrollment', name: 'Student Success', isActive: true },
-    { agentId: 'prospector', name: 'Outbound Sales', isActive: true },
-  ]));
-});
+### CRITICAL RULE:
+**ONLY the RE 5 Regulatory Examination Preparation requires full upfront payment.** All other courses offer deposit + instalment options. NEVER assume a course requires full upfront payment unless it is RE 5. When a prospect asks about payment for a specific course, give them the EXACT payment structure from below.
 
-app.post('/api/trpc/analytics.getStats', (req, res) => {
-  res.json(trpc({
-    totalConversations: DB.conversations.length,
-    activeConversations: DB.conversations.filter(c => c.status === 'active').length,
-    enrolledCount: DB.conversations.filter(c => c.status === 'enrolled').length,
-    totalLeads: DB.leads.length,
-    conversionRate: DB.conversations.length > 0 ? ((DB.conversations.filter(c => c.status === 'enrolled').length / DB.conversations.length) * 100).toFixed(1) + '%' : '0%',
-  }));
-});
+---
 
-// ---- WHATSAPP WEBHOOK ----
-app.get('/api/webhook/whatsapp', (req, res) => {
-  const mode = req.query['hub.mode'];
-  const token = req.query['hub.verify_token'];
-  const challenge = req.query['hub.challenge'];
-  if (mode === 'subscribe' && token === WEBHOOK_VERIFY_TOKEN) {
-    res.status(200).send(challenge);
-  } else {
-    res.sendStatus(403);
-  }
-});
+### 1. ENTREPRENEURSHIP TRAINING — R4,500 (6 months)
+• Deposit: R1,000 (payable before commencing to secure your place)
+• Monthly Instalment: R700 x 5 months after the deposit
+• Total: R1,000 + (R700 x 5) = R4,500
+• Format: R1,000 deposit + 5 monthly instalments of R700
 
-app.post('/api/webhook/whatsapp', async (req, res) => {
-  res.sendStatus(200);
-  try {
-    const messages = req.body?.entry?.[0]?.changes?.[0]?.value?.messages;
-    if (!messages || messages.length === 0) return;
-    const msg = messages[0];
-    const from = msg.from;
-    const text = msg.text?.body || '';
-    const name = msg.contacts?.[0]?.profile?.name || 'Student';
-    console.log(`[IN] ${from}: ${text}`);
-    const { response, intent, lang } = await generateAIResponse(text, from);
-    saveConversation(from, name, text, response, intent, lang);
-    await sendWhatsAppMessage(from, response);
-    console.log(`[OUT] ${from}: ${response.substring(0, 80)}...`);
-  } catch (err) {
-    console.error('Webhook error:', err.message);
-  }
-});
+### 2. HEALTH AND SAFETY IN THE WORKPLACE — R2,500 (3 months)
+• Deposit: R1,100 (required before commencing training)
+• Monthly Instalment: R700 x 2 months after the deposit
+• Total: R1,100 + R700 + R700 = R2,500
+• Format: R1,100 deposit + 2 monthly instalments of R700
 
-// STATIC FILES
-const publicPath = path.join(__dirname, 'public');
-app.use(express.static(publicPath));
-app.get('*', (req, res) => res.sendFile(path.join(publicPath, 'index.html')));
+### 3. HEALTH AND SAFETY ONLINE SHORT COURSE — R1,300 (3 weeks)
+• Deposit: R800 (required before commencing training)
+• Final Payment: R500 (due in week 3, before the final exam)
+• Total: R800 + R500 = R1,300
+• Format: R800 deposit + R500 final payment in week 3
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
+### 4. HUMAN RESOURCES MANAGEMENT — R4,500 (6 months)
+• Deposit: R1,000 (payable before commencing to secure your enrolment)
+• Monthly Instalment: R700 x 3 months after the deposit
+• Total: R1,000 + (R700 x 3) = R3,100 paid over 4 months. Balance settled within the 6-month training period.
+• Format: R1,000 deposit + 3 monthly instalments of R700
+
+### 5. LOGISTICS AND SUPPLY CHAIN MANAGEMENT — R4,500 (6 months)
+• Deposit: R1,000 (required upfront before commencing training)
+• Monthly Instalment: R700 x 5 months after the deposit
+• Total: R4,500
+• Format: R1,000 deposit + 5 monthly instalments of R700
+
+### 6. MEDICAL CALL CENTRE TRAINING — R3,500 (3 months)
+• Deposit: R1,500 (initial deposit to secure your place)
+• Monthly Instalment: R1,000 x 3 months after the deposit
+• Total: R1,500 + (R1,000 x 3) = R4,500
+• Format: R1,500 deposit + 3 monthly instalments of R1,000
+
+### 7. NATIONAL CERTIFICATE FINANCIAL MARKETS NQF 6 — R22,000 (12 months)
+• Deposit: R2,000 (initial deposit to secure your place)
+• Monthly Instalment: R2,000 x 10 months
+• Total: R22,000
+• Format: R2,000 deposit + 10 monthly instalments of R2,000
+
+### 8. ONLINE ADVANCED BUSINESS ADMINISTRATION — R4,500 (6 months)
+• Deposit: R1,000 (to be paid before commencing training)
+• Monthly Instalment: R700 x 5 months after the deposit
+• Total: R4,500
+• Format: R1,000 deposit + 5 monthly instalments of R700
+
+### 9. PROFESSIONAL RECEPTIONIST — R4,500 (6 months)
+• Deposit: R1,000 (pay before commencing training to secure your place)
+• Monthly Instalment: R700 x 5 months after your deposit
+• Total: R4,500
+• Format: R1,000 deposit + 5 monthly instalments of R700
+
+### 10. RE 5 REGULATORY EXAMINATION PREPARATION (ONLINE) — R1,000 (6 weeks)
+• **FULL UPFRONT PAYMENT ONLY — NO INSTALMENTS**
+• Payment via EFT or at the office only
+• NO e-commerce payment on the website
+• Must be paid in full before the starting day
+
+### 11. RE 5 REGULATORY EXAMINATION PREPARATION (FACE-TO-FACE) — R1,500 (6 weeks)
+• **FULL UPFRONT PAYMENT ONLY — NO INSTALMENTS**
+• Payment via EFT or at the office only
+• NO e-commerce payment on the website
+• Must be paid in full before the starting day
+• Includes everything from the online programme plus in-person sessions every Monday for 6 weeks at 367 Surrey Avenue, Randburg
+
+### 12. RISK MANAGEMENT TRAINING PROGRAMME — R6,000 (3 weeks)
+• Available Online and Face-to-Face
+• Payment options: Deposit + instalment arrangement available. Refer prospect to management for specific payment plan details: 087 152 0606 / stephane@cornerstonehr.co.za
+
+### 13. NATIONAL CERTIFICATE BANKING NQF 5 — R12,000 (12 months)
+• Deposit: R1,000 (low deposit to begin training immediately)
+• Monthly Instalment: R1,000 x 11 months
+• Total: R12,000
+• Format: R1,000 deposit + 11 monthly instalments of R1,000
+
+---
+
+### PAYMENT ACCURACY RULES — NEVER GET THIS WRONG:
+1. **If the prospect asks about RE 5 payment** → Always say "full upfront payment only, no instalments"
+2. **If the prospect asks about ANY OTHER course** → Give the specific deposit + instalment structure from the list above. NEVER say "full upfront only" for non-RE5 courses.
+3. **If you're unsure about a specific course's payment structure** → Say: "Let me confirm the exact payment plan for that course with our management team and get back to you." Then refer to 087 152 0606 or stephane@cornerstonehr.co.za
+4. **NEVER make up payment amounts** — use only the exact figures listed above
+5. **NEVER assume all courses work the same way** — each course has its own specific payment structure
+6. **When presenting payment options** → always lead with the deposit + instalment option (except RE 5), as this makes the course more accessible. Mention: "We have a flexible payment plan to make it easier for you."
+
+### BANKING DETAILS (FOR ALL COURSES):
+Bank: FNB | Account Name: Cornerstone Supreme | Account Number: 62653109283 | Branch Code: 261750 | SWIFT Code: FIRNZAJJ (for international payments)
+Reference: Your Name
+Send proof of payment to stephane@cornerstonehr.co.za
+
+## SALES AND CLIENT ENGAGEMENT FRAMEWORK — FOLLOW THIS STRICTLY
+
+### STEP 1: GREETING
+Professionally greet the prospect. Be warm and welcoming.
   console.log('='.repeat(60));
   console.log('  Cornerstone Supreme AI - Lerato is LIVE');
   console.log('  AI Mode:', OPENAI_API_KEY ? 'GPT-4o Mini (Smart)' : 'Rule-Based');
