@@ -33,19 +33,19 @@ function saveDB() {
 function createDefaultDB() {
   return {
     courses: [
-      { id: 1, title: 'Entrepreneurship Training Online Short Course', category: 'Business', price: 'R4,500', duration: '6 months', description: 'Whether starting a business, launching a new division, or seeking to invest in new ventures, entrepreneurship and business management skills are vital to success. Integrates multiple core modules to prepare students for the real world of entrepreneurship. Advanced Certificate.', format: 'Online', certification: 'Advanced Certificate', status: 'published' },
-      { id: 2, title: 'Health and Safety in the Workplace', category: 'Health & Safety', price: 'R2,500', duration: '3 months', description: 'Equips you with skills to ensure legal compliance and create a safe, productive working environment. Covers NLP, Emotional Intelligence, Safety Procedure Manual, Workplace Safety & Ergonomics, and core OHS principles. Advanced Certificate.', format: 'Online', certification: 'Advanced Certificate', status: 'published' },
-      { id: 3, title: 'Health and Safety Online Short Course', category: 'Health & Safety', price: 'R1,300', duration: '3 weeks', description: 'A 3-week online certificate course giving you the foundation to build a safety culture. Covers defining safety culture, identifying hazards, writing a safety plan, incident management, and reviewing the programme.', format: 'Online', certification: 'Certificate', status: 'published' },
-      { id: 4, title: 'Human Resources Management', category: 'HR', price: 'R4,500', duration: '6 months', description: 'Equips HR professionals to attract, hire, train, and retain top talent while managing performance, grievances, and workplace wellness. 17 comprehensive modules covering people & leadership, business & process, workplace & digital skills.', format: 'Online', certification: 'Advanced Certificate', status: 'published' },
-      { id: 5, title: 'Logistics and Supply Chain Management', category: 'Business', price: 'R4,500', duration: '6 months', description: 'Master core concepts of supply chain management including flow, core models, supply chain drivers, key metrics, benchmarking techniques. Covers Plan, Source, Deliver, and Return. Advanced Certificate.', format: 'Online', certification: 'Advanced Certificate', status: 'published' },
-      { id: 6, title: 'Medical Call Centre Training', category: 'Healthcare', price: 'R3,500', duration: '3 months', description: 'Equips individuals with skills to effectively handle calls and inquiries in a healthcare setting. Covers medical terminology, communication skills, confidentiality, emergency management, call management, and legal & ethical obligations.', format: 'Online', certification: 'Certificate', status: 'published' },
-      { id: 7, title: 'National Certificate Financial Markets and Instruments NQF 6', category: 'Finance', price: 'R22,000', duration: '12 months', description: 'One-year online qualification (SAQA ID: 50481, 120 Credits, NQF Level 6). Develops competent professionals who can analyse and make informed decisions in the financial landscape. Covers investment decisions, company analysis, debt market, market trends, cash flow analysis, and risk management.', format: 'Online', certification: 'National Certificate NQF 6', status: 'published' },
-      { id: 8, title: 'Online Advanced Business Administration', category: 'Business', price: 'R4,500', duration: '6 months', description: 'Teaches essential administrative duties, business operations, processes, and customer service basics. 15 modules spanning leadership, finance, technology, and core business skills. Advanced Certificate.', format: 'Online', certification: 'Advanced Certificate', status: 'published' },
-      { id: 9, title: 'Professional Receptionist Online Short Course', category: 'Business', price: 'R4,500', duration: '6 months', description: 'Launch your career in business administration, customer service, and office management. 16 comprehensive modules including business foundations, communication & relations, service & marketing, and Microsoft Office Suite.', format: 'Online', certification: 'Advanced Certificate', status: 'published' },
-      { id: 10, title: 'RE 5 Regulatory Examination Preparation (Online)', category: 'Finance', price: 'R1,000', duration: '6 weeks', description: 'Online preparation for the RE 5 Regulatory Examination, mandatory for financial services providers in South Africa. Covers all 10 RE 5 modules via live facilitator-led sessions. Full upfront payment required.', format: 'Online', certification: 'Certificate of Completion', status: 'published' },
-      { id: 13, title: 'RE 5 Regulatory Examination Preparation (Face-to-Face)', category: 'Finance', price: 'R1,500', duration: '6 weeks', description: 'Face-to-face preparation for the RE 5 Regulatory Examination at our Randburg headquarters. Attends every Monday for 6 weeks. Includes everything from the online programme plus in-person instruction. Full upfront payment required.', format: 'Face-to-Face', certification: 'Certificate of Completion', status: 'published' },
-      { id: 11, title: 'Risk Management Training Programme', category: 'Business', price: 'R6,000', duration: '3 weeks', description: 'Aligned to SAQA ID 252025. Prepares you to identify, assess, and manage risk within your unit. Grounded in ISO 31000 and COSO internationally recognised standards. Certificate of Competence.', format: 'Online & Face-to-Face', certification: 'Certificate of Competence', status: 'published' },
-      { id: 12, title: 'National Certificate Banking NQF 5', category: 'Banking', price: 'R12,000', duration: '12 months', description: '120-credit qualification (SAQA ID: 20186, NQF Level 5). Gateway to commercial banks, consumer lending institutions, cooperative financial organizations, and government regulatory departments. Six core modules. BankSETA Accredited.', format: 'Online', certification: 'National Certificate NQF 5', status: 'published' }
+      { id: 1, title: 'Entrepreneurship Training Online Short Course', category: 'Business', price: 'R4,500', duration: '6 months', description: 'Whether starting a business, launching a new division, or seeking to invest in new ventures, entrepreneurship and business management skills are vital to success. Integrates multiple core modules to prepare students for the real world of entrepreneurship. Advanced Certificate. Professionally recognised short course — does not carry NQF credits.', format: 'Online', certification: 'Advanced Certificate', status: 'published' },
+      { id: 2, title: 'Health and Safety in the Workplace', category: 'Health & Safety', price: 'R2,500', duration: '3 months', description: 'Equips you with skills to ensure legal compliance and create a safe, productive working environment. Covers NLP, Emotional Intelligence, Safety Procedure Manual, Workplace Safety & Ergonomics, and core OHS principles. Advanced Certificate. Professionally recognised short course — does not carry NQF credits.', format: 'Online', certification: 'Advanced Certificate', status: 'published' },
+      { id: 3, title: 'Health and Safety Online Short Course', category: 'Health & Safety', price: 'R1,300', duration: '3 weeks', description: 'A 3-week online certificate course giving you the foundation to build a safety culture. Covers defining safety culture, identifying hazards, writing a safety plan, incident management, and reviewing the programme. Professionally recognised short course — does not carry NQF credits.', format: 'Online', certification: 'Certificate', status: 'published' },
+      { id: 4, title: 'Human Resources Management', category: 'HR', price: 'R4,500', duration: '6 months', description: 'Equips HR professionals to attract, hire, train, and retain top talent while managing performance, grievances, and workplace wellness. 17 comprehensive modules covering people & leadership, business & process, workplace & digital skills. Advanced Certificate. Professionally recognised short course — does not carry NQF credits.', format: 'Online', certification: 'Advanced Certificate', status: 'published' },
+      { id: 5, title: 'Logistics and Supply Chain Management', category: 'Business', price: 'R4,500', duration: '6 months', description: 'Master core concepts of supply chain management including flow, core models, supply chain drivers, key metrics, benchmarking techniques. Covers Plan, Source, Deliver, and Return. Advanced Certificate. Professionally recognised short course — does not carry NQF credits.', format: 'Online', certification: 'Advanced Certificate', status: 'published' },
+      { id: 6, title: 'Medical Call Centre Training', category: 'Healthcare', price: 'R3,500', duration: '3 months', description: 'Equips individuals with skills to effectively handle calls and inquiries in a healthcare setting. Covers medical terminology, communication skills, confidentiality, emergency management, call management, and legal & ethical obligations. Professionally recognised short course — does not carry NQF credits.', format: 'Online', certification: 'Certificate', status: 'published' },
+      { id: 7, title: 'National Certificate Financial Markets and Instruments NQF 6', category: 'Finance', price: 'R22,000', duration: '12 months', description: 'One-year online qualification (SAQA ID: 50481, 120 Credits, NQF Level 6). Develops competent professionals who can analyse and make informed decisions in the financial landscape. Covers investment decisions, company analysis, debt market, market trends, cash flow analysis, and risk management. NQF-aligned qualification — NOT BANKSETA-accredited.', format: 'Online', certification: 'National Certificate NQF 6', status: 'published' },
+      { id: 8, title: 'Online Advanced Business Administration', category: 'Business', price: 'R4,500', duration: '6 months', description: 'Teaches essential administrative duties, business operations, processes, and customer service basics. 15 modules spanning leadership, finance, technology, and core business skills. Advanced Certificate. Professionally recognised short course — does not carry NQF credits.', format: 'Online', certification: 'Advanced Certificate', status: 'published' },
+      { id: 9, title: 'Professional Receptionist Online Short Course', category: 'Business', price: 'R4,500', duration: '6 months', description: 'Launch your career in business administration, customer service, and office management. 16 comprehensive modules including business foundations, communication & relations, service & marketing, and Microsoft Office Suite. Advanced Certificate. Professionally recognised short course — does not carry NQF credits.', format: 'Online', certification: 'Advanced Certificate', status: 'published' },
+      { id: 10, title: 'RE 5 Regulatory Examination Preparation (Online)', category: 'Finance', price: 'R1,000', duration: '6 weeks', description: 'Online preparation for the RE 5 Regulatory Examination, mandatory for financial services providers in South Africa. Covers all 10 RE 5 modules via live facilitator-led sessions. Full upfront payment required. This is an exam preparation course — it does NOT carry NQF credits. Upon completion, you must book and write the RE 5 exam independently at Moonstone.', format: 'Online', certification: 'Certificate of Completion', status: 'published' },
+      { id: 13, title: 'RE 5 Regulatory Examination Preparation (Face-to-Face)', category: 'Finance', price: 'R1,500', duration: '6 weeks', description: 'Face-to-face preparation for the RE 5 Regulatory Examination at our Randburg headquarters. Attends every Monday for 6 weeks. Includes everything from the online programme plus in-person instruction. Full upfront payment required. This is an exam preparation course — it does NOT carry NQF credits. Upon completion, you must book and write the RE 5 exam independently at Moonstone.', format: 'Face-to-Face', certification: 'Certificate of Completion', status: 'published' },
+      { id: 11, title: 'Risk Management Training Programme', category: 'Business', price: 'R6,000', duration: '3 weeks', description: 'Aligned to SAQA ID 252025. Prepares you to identify, assess, and manage risk within your unit. Grounded in ISO 31000 and COSO internationally recognised standards. Certificate of Competence. Professionally recognised short course — does not carry NQF credits.', format: 'Online & Face-to-Face', certification: 'Certificate of Competence', status: 'published' },
+      { id: 12, title: 'National Certificate Banking NQF 5', category: 'Banking', price: 'R12,000', duration: '12 months', description: '120-credit qualification (SAQA ID: 20186, NQF Level 5). Gateway to commercial banks, consumer lending institutions, cooperative financial organizations, and government regulatory departments. Six core modules. This is the ONLY BANKSETA-accredited programme we offer. Certificate issued through BANKSETA after external moderation.', format: 'Online', certification: 'National Certificate NQF 5', status: 'published' }
     ],
     students: [],
     conversations: [],
@@ -53,12 +53,13 @@ function createDefaultDB() {
     enrollments: [],
     brochures: [],
     leads: [],
+    screenshots: [],
     settings: {
       companyName: 'Cornerstone Supreme Education',
       companyPhone: '0718374853',
       officePhone: '087 152 0606',
       companyWebsite: 'https://www.cornerstonehr.co.za',
-      companyEmail: 'info@cornerstonehr.co.za',
+      companyEmail: 'stephane@cornerstonehr.co.za',
       brochureUrl: 'https://www.cornerstonehr.co.za',
       bankName: 'FNB',
       accountName: 'Cornerstone Supreme',
@@ -67,7 +68,7 @@ function createDefaultDB() {
       swiftCode: 'FIRNZAJJ'
     },
     context: {},
-    _nextId: { courses: 14, students: 1, conversations: 1, messages: 1, enrollments: 1, brochures: 1, leads: 1 }
+    _nextId: { courses: 14, students: 1, conversations: 1, messages: 1, enrollments: 1, brochures: 1, leads: 1, screenshots: 1 }
   };
 }
 
@@ -84,120 +85,6 @@ process.on('SIGTERM', () => { saveDB(); process.exit(0); });
 setInterval(saveDB, 30000);
 
 console.log('Database loaded. Courses:', DB.courses.length);
-
-// ============================================================
-// tRPC HELPER
-// ============================================================
-function trpc(data) {
-  return { result: { data: { json: data } } };
-}
-
-function parseInput(req) {
-  return req.body?.json || req.body || {};
-}
-
-// ============================================================
-// COURSE HELPERS
-// ============================================================
-function getCourseByTitle(title) {
-  const lower = title.toLowerCase();
-  return DB.courses.find(c => c.status === 'published' && c.title.toLowerCase().includes(lower));
-}
-
-function getContext(phone) {
-  if (!DB.context[phone]) {
-    DB.context[phone] = { last_intent: '', last_course_mentioned: '', message_history: [], stage: 'greeting', lead_info: {} };
-  }
-  return DB.context[phone];
-}
-
-function updateContext(phone, intent, courseMentioned, studentMessage, leratoReply) {
-  const ctx = getContext(phone);
-  ctx.last_intent = intent;
-  if (courseMentioned) ctx.last_course_mentioned = courseMentioned;
-  ctx.message_history.push({ role: 'student', msg: studentMessage, time: new Date().toISOString() });
-  ctx.message_history.push({ role: 'lerato', msg: leratoReply, time: new Date().toISOString() });
-  if (ctx.message_history.length > 20) ctx.message_history = ctx.message_history.slice(-20);
-  saveDB();
-}
-
-// ============================================================
-// DYNAMIC INTAKE DATE CALCULATOR
-// ============================================================
-function getIntakeInfo() {
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = now.getMonth();
-  const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-  
-  let earlyIntake = null;
-  for (let d = 1; d <= 5; d++) {
-    const date = new Date(year, month, d);
-    if (date.getDay() === 1) { earlyIntake = date; break; }
-  }
-  
-  let lateIntake = null;
-  const lastDay = new Date(year, month + 1, 0).getDate();
-  for (let d = 24; d <= lastDay; d++) {
-    const date = new Date(year, month, d);
-    if (date.getDay() === 1) { lateIntake = date; break; }
-  }
-  
-  let nextMonthIntake = null;
-  for (let d = 1; d <= 5; d++) {
-    const date = new Date(year, month + 1, d);
-    if (date.getDay() === 1) { nextMonthIntake = date; break; }
-  }
-  
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  
-  let currentIntake = null;
-  let currentIntakeLabel = '';
-  let urgencyMessage = '';
-  
-  if (earlyIntake) {
-    const earlyDate = new Date(earlyIntake);
-    earlyDate.setHours(0, 0, 0, 0);
-    if (earlyDate >= today) {
-      currentIntake = earlyIntake;
-      currentIntakeLabel = `Monday, ${earlyIntake.getDate()} ${monthNames[earlyIntake.getMonth()]} ${earlyIntake.getFullYear()}`;
-      const daysUntil = Math.ceil((earlyIntake - today) / (1000 * 60 * 60 * 24));
-      if (daysUntil <= 7) {
-        urgencyMessage = `Our next intake is coming up very soon — ${currentIntakeLabel}. Spaces are limited, so I'd recommend securing your spot today to avoid missing out.`;
-      } else {
-        urgencyMessage = `We have an upcoming intake on ${currentIntakeLabel}. It's a great time to register and get your study materials ready.`;
-      }
-    }
-  }
-  
-  if (!currentIntake && lateIntake) {
-    const lateDate = new Date(lateIntake);
-    lateDate.setHours(0, 0, 0, 0);
-    if (lateDate >= today) {
-      currentIntake = lateIntake;
-      currentIntakeLabel = `Monday, ${lateIntake.getDate()} ${monthNames[lateIntake.getMonth()]} ${lateIntake.getFullYear()}`;
-      const daysUntil = Math.ceil((lateIntake - today) / (1000 * 60 * 60 * 24));
-      if (daysUntil <= 7) {
-        urgencyMessage = `Our next intake is coming up very soon — ${currentIntakeLabel}. Spaces are filling up, so I'd recommend registering now to secure your place.`;
-      } else {
-        urgencyMessage = `Our next intake is on ${currentIntakeLabel}. Registering now gives you plenty of time to get everything sorted before classes begin.`;
-      }
-    }
-  }
-  
-  if (!currentIntake && nextMonthIntake) {
-    currentIntake = nextMonthIntake;
-    currentIntakeLabel = `Monday, ${nextMonthIntake.getDate()} ${monthNames[nextMonthIntake.getMonth()]} ${nextMonthIntake.getFullYear()}`;
-    urgencyMessage = `Our next intake is on ${currentIntakeLabel}. Registering now means you'll be all set to start fresh — and you won't miss this opportunity.`;
-  }
-  
-  return { currentIntake, currentIntakeLabel, urgencyMessage, earlyIntakeLabel: earlyIntake ? `${earlyIntake.getDate()} ${monthNames[earlyIntake.getMonth()]}` : null, lateIntakeLabel: lateIntake ? `${lateIntake.getDate()} ${monthNames[lateIntake.getMonth()]}` : null };
-}
-
-// ============================================================
-// LEAD INFO EXTRACTION
-// ============================================================
 function extractLeadInfo(phone, message) {
   const ctx = getContext(phone);
   if (!ctx.lead_info) ctx.lead_info = {};
