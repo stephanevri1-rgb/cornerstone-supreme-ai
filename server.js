@@ -1198,3 +1198,151 @@ This helps our management team prepare your registration pack with everything yo
 • Your full name and surname
 • What field or career you're interested in
 • Whether you're looking to study online while working        
+This will help me recommend the best programme for your goals. 😊`;
+      }
+      break;
+
+    case 'pricing':
+      if (relevantCourse) {
+        const isRE5 = relevantCourse.title.toLowerCase().includes('re 5');
+        let paymentInfo = '';
+        if (isRE5) {
+          paymentInfo = `Payment for RE 5 is **full upfront only** — no instalments. We accept EFT or payment at our office. NO e-commerce payments on the website.`;
+        } else {
+          paymentInfo = `We offer a flexible payment plan for this course — a deposit plus monthly instalments to make it affordable. I can give you the exact breakdown if you'd like!`;
+        }
+        response = `The ${relevantCourse.title} is ${relevantCourse.price} for the full ${relevantCourse.duration} programme.
+
+${paymentInfo}
+
+${intake.urgencyMessage}
+
+Would you like me to walk you through the registration process?`;
+      } else {
+        response = `Our courses range from R1,300 to R22,000 depending on the programme and level.
+
+Here's a quick overview:
+• Short Certificate Courses: R1,300 – R3,500
+• Advanced Certificate Programmes: R4,500
+• Specialist Programmes: R6,000
+• National Certificate Banking NQF 5: R12,000
+• National Certificate Financial Markets NQF 6: R22,000
+
+Most of our courses offer flexible deposit + monthly instalment payment plans. Only the RE 5 preparation requires full upfront payment.
+
+${intake.urgencyMessage}
+
+Which area interests you — Finance, Business & HR, or Healthcare? I can give you exact pricing and the payment plan for any specific course. 😊`;
+      }
+      break;
+
+    case 'courses':
+      response = `Great question! We have a wide range of professional programmes. Here's what we offer:
+
+📊 **Finance & Banking**
+• RE 5 Exam Prep — R1,500 (6 weeks)
+• National Certificate Banking NQF 5 — R12,000 (12 months) — BankSETA Accredited
+• Financial Markets NQF 6 — R22,000 (12 months)
+
+👔 **Business & HR**
+• Entrepreneurship — R4,500 (6 months)
+• HR Management — R4,500 (6 months)
+• Business Administration — R4,500 (6 months)
+• Professional Receptionist — R4,500 (6 months)
+• Logistics & Supply Chain — R4,500 (6 months)
+
+🏥 **Healthcare & Safety**
+• Medical Call Centre — R3,500 (3 months)
+• Health & Safety — R2,500 (3 months) / R1,300 (3 weeks)
+• Risk Management — R6,000 (3 weeks)
+
+${intake.urgencyMessage}
+
+All our certifications are industry-recognised and SAQA-aligned. Which field are you most drawn to? 😊`;
+      break;
+
+    case 'enrollment':
+      if (relevantCourse) {
+        const isRE5Enroll = relevantCourse.title.toLowerCase().includes('re 5');
+        if (isRE5Enroll) {
+          response = `Excellent choice! The ${relevantCourse.title} is the best step toward your career in financial services. Here's how to get started:
+
+${intake.urgencyMessage}
+
+To secure your place, please complete your enrolment right now using this link: https://zjw4jz46ae4ok.kimi.page
+
+Once you've submitted the form, our management team will follow up with you via email and send you your Admission Letter, Invoice, and any additional documentation needed. Payment must be made in full upfront before the starting day.
+
+Could you also share with me:
+• Your full name and surname
+• Your email address
+• An alternative contact number
+
+This way we can have everything prepared for you right away! 😊`;
+        } else {
+          response = `Excellent choice! The ${relevantCourse.title} is a fantastic programme. Here's how to get started:
+
+${intake.urgencyMessage}
+
+To register, simply:
+1️⃣ Visit https://www.cornerstonehr.co.za and click "Enrol Now"
+2️⃣ Fill in your details
+3️⃣ Choose your preferred payment option
+4️⃣ Our team will send you confirmation within 24 hours
+
+Or, to make it even easier, I can pass your details directly to our management team and they'll send you the registration form and invoice. 
+
+Could you share with me:
+• Your full name and surname
+• Your email address
+• An alternative contact number
+
+This way we can get everything prepared for you right away!`;
+        }
+      } else {
+        response = `I'd love to help you get enrolled! Here's how it works:
+
+${intake.urgencyMessage}
+
+1️⃣ Visit https://www.cornerstonehr.co.za and select your course
+2️⃣ Click "Enrol Now" and fill in your details
+3️⃣ Choose your payment option — most courses offer a deposit + monthly instalment plan (only RE 5 requires full upfront payment)
+4️⃣ You'll receive confirmation within 24 hours
+
+Or, if you'd like, I can have our management team send the registration documents directly to you. Just share:
+• Your full name and surname
+• Which course you're interested in
+• Your email address
+
+Which course has caught your eye?`;
+      }
+      ctx.stage = 'lead_collection';
+      break;
+
+    case 'brochure':
+      response = `Absolutely! You can view all our course details on our website:
+https://www.cornerstonehr.co.za
+
+But honestly, if you tell me which area you're interested in — Finance, Business & HR, or Healthcare — I can give you all the details right here, including pricing, duration, certification, and career prospects. It might save you some time!
+
+${intake.urgencyMessage}
+
+What field are you looking at?`;
+      break;
+
+    case 'payment_details':
+      response = `Great question! We have flexible payment options to suit your budget:
+
+📅 **Flexible Payment Plan** — Deposit + monthly instalments for most courses (except RE 5 which is full upfront)
+🏢 **Employer-Sponsored** — Your company pays on your behalf
+
+Our banking details for EFT or direct deposit:
+
+🏦 Bank: FNB
+📋 Account Name: Cornerstone Supreme
+📋 Account Number: 62653109283
+📋 Branch Code: 261750
+📋 SWIFT Code: FIRNZAJJ (for international payments)
+📝 Reference: Your Name
+
+Once you've paid, email your proof of payment to stephane@cornerstonehr.co.za
