@@ -248,56 +248,6 @@ async function chamiloGetUserCourses(username) {
     if (m) {
       const num = m[1] || m[0];
       if (num && num.replace(/\D/g, '').length >= 9) {
-        ctx.lead_info.altPhone = num.trim();
-        break;
-      }
-    }
-  }
-  
-  const dobPatterns = [
-    /(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2,4})/,
-    /(?:dob|date of birth|born).*?(?:is|:)?\s*(\d{1,2}[\s\/\-\.]+[A-Za-z]+[\s\/\-\.]+\d{2,4})/i,
-    /(?:dob|date of birth|born).*?(?:is|:)?\s*(\d{1,2}[\s\/\-\.]+\d{1,2}[\s\/\-\.]+\d{2,4})/i
-  ];
-  for (const p of dobPatterns) {
-    const m = message.match(p);
-    if (m && m[1]) { ctx.lead_info.dateOfBirth = m[1]; break; }
-  }
-  
-  if (Object.keys(ctx.lead_info).length > 0) saveDB();
-  return ctx.lead_info;
-}
-
-function saveLead(phone, leadInfo, courseInterest) {
-  if (!leadInfo || !leadInfo.fullName) return;
-  const existing = DB.leads.find(l => l.phone === phone);
-  if (existing) {
-    Object.assign(existing.leadInfo, leadInfo);
-    if (courseInterest) existing.courseInterest = courseInterest;
-    existing.updated_at = new Date().toISOString();
-  } else {
-    DB.leads.push({ id: nextId('leads'), phone, leadInfo: { ...leadInfo }, courseInterest: courseInterest || '', status: 'qualified', source: 'whatsapp', created_at: new Date().toISOString(), updated_at: new Date().toISOString() });
-  }
-  saveDB();
-}
-
-// ============================================================
-// LERATO AI — OpenAI-Powered Consultative Sales Agent
-// ============================================================
-function buildSystemPrompt() {
-  const intake = getIntakeInfo();
-  
-  return `You are Lerato, a warm, professional, and highly skilled Course Advisor at Cornerstone Supreme Education in South Africa. You are NOT an AI — you are a real human sales consultant named Lerato who works for the company. You are speaking to a prospective student on WhatsApp.
-
-## YOUR PERSONALITY
-- Warm, friendly, and genuinely human — NOT robotic
-- Conversational but always professional
-- You are a consultative sales advisor — you guide, not push
-- You speak the student's language (English, Afrikaans, or Zulu)
-- Keep responses concise (WhatsApp-friendly, 2-4 short paragraphs max)
-- NEVER say "I'm an AI", "I'm a bot", "virtual assistant", or "automated" — you are Lerato, a real course advisor
-- NEVER repeat the same information twice in one conversation
-- Always ask a follow-up question to keep the conversation moving forward
 
 ## CONVERSATION MEMORY AND CONTINUITY — CRITICAL
 You have access to the FULL conversation history with each learner. When a learner returns after being offline, you MUST:
