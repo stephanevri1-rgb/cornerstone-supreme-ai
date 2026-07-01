@@ -348,56 +348,50 @@ ${intake.urgencyMessage}
 
 Which course are you interested in? I can give you the exact price!`;
       } else if (/\b(address|location|office|where are you|visit|physical|postal|direction)\b/.test(lower)) {
-        response = `Our office is located at:
-
-📍 Cornerstone Supreme (Pty) Ltd
-367 Surrey Avenue, Block B
-Ground Floor, Ferdale
-Randburg, 2125
-Johannesburg
-
-You can also reach us on:
-📱 WhatsApp: 0718374853
-☎️ Office: 087 152 0606
-📧 Email: info@cornerstonehr.co.za
-
-Would you like to book a visit or do you have questions about our courses?`;
-      } else if (/\b(requirement|need|matric|grade|qualification|entry requirement)\b/.test(lower)) {
-        response = `Most of our courses require a Matric certificate and basic computer literacy. For the NQF 5 and NQF 6 qualifications, work experience in the field is a plus but not always required.
-
-${intake.urgencyMessage}
-
-Which course are you interested in? I can tell you the specific requirements for that one, and we can check if you're a good fit. 😊`;
-      } else if (/\b(duration|how long|period|time)\b/.test(lower)) {
-        if (relevantCourse) {
-          response = `The ${relevantCourse.title} runs for ${relevantCourse.duration}. All sessions are conducted online via live virtual classes, so you can study from anywhere in South Africa with flexible scheduling.
-
-Recorded sessions are also available if you miss a live class, which is great if you're working while studying.
-
-${intake.urgencyMessage}
-
-Would you like to know about the payment options or registration process for this course?`;
-        } else {
-          response = `Our courses range from 3 weeks to 12 months:
-• Short Certificate Courses: 3 weeks – 3 months
-• Advanced Certificate Programmes: 6 months
-• National Certificates (NQF 5 & 6): 12 months
-
-All are online with flexible scheduling. ${intake.urgencyMessage} Which course would you like to know about?`;
-        }
-      } else if (/\b(cert|certificate|accredited|nqf|saqa|recognised|recognized)\b/.test(lower)) {
-        response = `All our courses come with industry-recognized certifications. Our National Certificates (NQF 5 and NQF 6) are SAQA-registered and accredited by BankSETA.
-
-After completion, you'll receive:
-🎓 Your official certificate
-📁 A skills portfolio
-📝 A reference letter (on request)
-
-These qualifications are recognised by employers across South Africa. ${intake.urgencyMessage} Which course are you looking at?`;
-      } else if (/\b(job|work|career|employment|opportunity|salary|earn)\b/.test(lower)) {
-        response = `Great question! Our programmes are designed to open doors in the job market. For example:
-
-• **Banking NQF 5** → Commercial banks, lending institutions, regulatory departments
+  // Find Monday between 1st-5th of current month
+  let earlyIntake = null;
+  for (let d = 1; d <= 5; d++) {
+    const date = new Date(year, month, d);
+    if (date.getDay() === 1) { earlyIntake = date; break; }
+  }
+  
+  // Find Monday between 24th-31st of current month
+  let lateIntake = null;
+  const lastDay = new Date(year, month + 1, 0).getDate();
+  for (let d = 24; d <= lastDay; d++) {
+    const date = new Date(year, month, d);
+    if (date.getDay() === 1) { lateIntake = date; break; }
+  }
+  
+  // Find next month's early intake
+  let nextMonthIntake = null;
+  for (let d = 1; d <= 5; d++) {
+    const date = new Date(year, month + 1, d);
+    if (date.getDay() === 1) { nextMonthIntake = date; break; }
+  }
+  
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  
+  // Determine which intake to promote (must be in the future)
+  let currentIntake = null;
+  let currentIntakeLabel = '';
+  let urgencyMessage = '';
+  
+  if (earlyIntake) {
+    const earlyDate = new Date(earlyIntake);
+    earlyDate.setHours(0, 0, 0, 0);
+    if (earlyDate >= today) {
+      currentIntake = earlyIntake;
+      currentIntakeLabel = `Monday, ${earlyIntake.getDate()} ${monthNames[earlyIntake.getMonth()]} ${earlyIntake.getFullYear()}`;
+      const daysUntil = Math.ceil((earlyIntake - today) / (1000 * 60 * 60 * 24));
+      if (daysUntil <= 7) {
+        urgencyMessage = `Our next intake is coming up very soon — ${currentIntakeLabel}. Spaces are limited, so I'd recommend securing your spot today to avoid missing out.`;
+      } else {
+        urgencyMessage = `We have an upcoming intake on ${currentIntakeLabel}. It's a great time to register and get your study materials ready.`;
+      }
+    }
+  }
 • **Financial Markets NQF 6** → Investment firms, financial analysis, wealth management
 • **HR Management** → HR departments across all industries
 • **Medical Call Centre** → Healthcare administration, hospital call centres
