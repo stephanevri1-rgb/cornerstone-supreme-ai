@@ -748,56 +748,46 @@ ${intake.urgencyMessage}
 
 Or, if you'd like, I can have our management team send the registration documents directly to you. Just share:
 • Your full name and surname
-• Which course you're interested in
-• Your email address
+    case 'brochure':
+      response = `Absolutely! You can view all our course details on our website:
+https://www.cornerstonehr.co.za
 
-Which course has caught your eye?`;
-      }
-      ctx.stage = 'lead_collection';
-      break;## BANKING DETAILS
-Bank: FNB | Account Name: Cornerstone Supreme | Account Number: 62653109283 | Branch Code: 261750 | SWIFT Code: FIRNZAJJ (for international payments)
-Reference: Your Name
-Send proof of payment to stephane@cornerstonehr.co.za
+But honestly, if you tell me which area you're interested in — Finance, Business & HR, or Healthcare — I can give you all the details right here, including pricing, duration, certification, and career prospects. It might save you some time!
 
-## PAYMENT METHODS — COURSE-SPECIFIC (DO NOT GUESS — USE THE EXACT PAYMENT STRUCTURE FOR EACH COURSE)
+${intake.urgencyMessage}
 
-### CRITICAL RULE:
-**ONLY the RE 5 Regulatory Examination Preparation requires full upfront payment.** All other courses offer deposit + instalment options. NEVER assume a course requires full upfront payment unless it is RE 5. When a prospect asks about payment for a specific course, give them the EXACT payment structure from below.
+What field are you looking at?`;
+      break;
 
----
+    case 'payment_details':
+      response = `Great question! We have flexible payment options to suit your budget:
 
-### 1. ENTREPRENEURSHIP TRAINING — R4,500 (6 months)
-• Deposit: R1,000 (payable before commencing to secure your place)
-• Monthly Instalment: R700 x 5 months after the deposit
-• Total: R1,000 + (R700 x 5) = R4,500
-• Format: R1,000 deposit + 5 monthly instalments of R700
+📅 **Flexible Payment Plan** — Deposit + monthly instalments for most courses (except RE 5 which is full upfront)
+🏢 **Employer-Sponsored** — Your company pays on your behalf
 
-### 2. HEALTH AND SAFETY IN THE WORKPLACE — R2,500 (3 months)
-• Deposit: R1,100 (required before commencing training)
-• Monthly Instalment: R700 x 2 months after the deposit
-• Total: R1,100 + R700 + R700 = R2,500
-• Format: R1,100 deposit + 2 monthly instalments of R700
+Our banking details for EFT or direct deposit:
 
-### 3. HEALTH AND SAFETY ONLINE SHORT COURSE — R1,300 (3 weeks)
-• Deposit: R800 (required before commencing training)
-• Final Payment: R500 (due in week 3, before the final exam)
-• Total: R800 + R500 = R1,300
-• Format: R800 deposit + R500 final payment in week 3
+🏦 Bank: FNB
+📋 Account Name: Cornerstone Supreme
+📋 Account Number: 62653109283
+📋 Branch Code: 261750
+📋 SWIFT Code: FIRNZAJJ (for international payments)
+📝 Reference: Your Name
 
-### 4. HUMAN RESOURCES MANAGEMENT — R4,500 (6 months)
-• Deposit: R1,000 (payable before commencing to secure your enrolment)
-• Monthly Instalment: R700 x 3 months after the deposit
-• Total: R1,000 + (R700 x 3) = R3,100 paid over 4 months. Balance settled within the 6-month training period.
-• Format: R1,000 deposit + 3 monthly instalments of R700
+Once you've paid, email your proof of payment to stephane@cornerstonehr.co.za
 
-### 5. LOGISTICS AND SUPPLY CHAIN MANAGEMENT — R4,500 (6 months)
-• Deposit: R1,000 (required upfront before commencing training)
-• Monthly Instalment: R700 x 5 months after the deposit
-• Total: R4,500
-• Format: R1,000 deposit + 5 monthly instalments of R700
+${intake.urgencyMessage}
 
-### 6. MEDICAL CALL CENTRE TRAINING — R3,500 (3 months)
-• Deposit: R1,500 (initial deposit to secure your place)
+Would you like me to help you choose a course, or do you have other questions? 😊`;
+      break;
+
+    case 'intake_dates':
+      response = `${intake.urgencyMessage}
+
+I'd really encourage you to register as soon as possible so we can secure your spot and get your study materials prepared. Would you like me to help you get the registration process started? 
+
+I can have our management team send you the registration form and invoice directly. Just share your full name, email, and which course you're interested in, and we'll take care of the rest! 😊`;
+      break;
 • Monthly Instalment: R1,000 x 3 months after the deposit
 • Total: R1,500 + (R1,000 x 3) = R4,500
 • Format: R1,500 deposit + 3 monthly instalments of R1,000
