@@ -198,56 +198,46 @@ async function chamiloAuthenticate() {
   
   if (!currentIntake && lateIntake) {
     const lateDate = new Date(lateIntake);
-    lateDate.setHours(0, 0, 0, 0);
-    if (lateDate >= today) {
-      currentIntake = lateIntake;
-      currentIntakeLabel = `Monday, ${lateIntake.getDate()} ${monthNames[lateIntake.getMonth()]} ${lateIntake.getFullYear()}`;
-      const daysUntil = Math.ceil((lateIntake - today) / (1000 * 60 * 60 * 24));
-      if (daysUntil <= 7) {
-        urgencyMessage = `Our next intake is coming up very soon — ${currentIntakeLabel}. Spaces are filling up, so I'd recommend registering now to secure your place.`;
-      } else {
-        urgencyMessage = `Our next intake is on ${currentIntakeLabel}. Registering now gives you plenty of time to get everything sorted before classes begin.`;
-      }
-    }
+  // Step 2: Get cached apiKey or re-authenticate
+async function chamiloGetApiKey() {
+  if (!chamiloSession.apiKey || Date.now() > chamiloSession.expires) {
+    return await chamiloAuthenticate();
   }
-  
-  // If both current month intakes have passed, use next month's early intake
-  if (!currentIntake && nextMonthIntake) {
-    currentIntake = nextMonthIntake;
-    currentIntakeLabel = `Monday, ${nextMonthIntake.getDate()} ${monthNames[nextMonthIntake.getMonth()]} ${nextMonthIntake.getFullYear()}`;
-    urgencyMessage = `Our next intake is on ${currentIntakeLabel}. Registering now means you'll be all set to start fresh — and you won't miss this opportunity.`;
-  }
-  
-  return {
-    currentIntake,
-    currentIntakeLabel,
-    urgencyMessage,
-    earlyIntakeLabel: earlyIntake ? `${earlyIntake.getDate()} ${monthNames[earlyIntake.getMonth()]}` : null,
-    lateIntakeLabel: lateIntake ? `${lateIntake.getDate()} ${monthNames[lateIntake.getMonth()]}` : null
-  };
+  return chamiloSession.apiKey;
 }
 
-// ============================================================
-// LEAD INFO EXTRACTION
-// ============================================================
-function extractLeadInfo(phone, message) {
-  const ctx = getContext(phone);
-  if (!ctx.lead_info) ctx.lead_info = {};
-  
-  const namePatterns = [
-    /(?:my name is|i am|i'm|call me|this is)\s+([A-Za-z\s]+?)(?:\.|,|$|\n|\d)/i,
-    /(?:full name|name and surname)\s*:?\s*([A-Za-z\s]+?)(?:\.|,|$|\n|\d)/i
-  ];
-  for (const p of namePatterns) {
-    const m = message.match(p);
-    if (m && m[1] && m[1].trim().length > 2) {
-      ctx.lead_info.fullName = m[1].trim();
-      break;
-    }
+// Generic v2 API call helper
+// CRITICAL: Uses api_key (underscore) not apiKey (camelCase)
+async function chamiloApiCall(action, extraParams = {}) {
+  const apiKey = await chamiloGetApiKey();
+  if (!apiKey) {
+    return { error: true, message: chamiloSession.lastError || 'Not authenticated', data: null };
   }
-  
-  const emailMatch = message.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
-  if (emailMatch) ctx.lead_info.email = emailMatch[0];
+  try {
+    const res = await fetch(`${CHAMILO_API_URL}v2.php`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action, api_key: apiKey, ...extraParams })
+    });
+    const data = await res.json();
+    if (data.error === true) {
+      return { error: true, message: data.message || `Action '${action}' failed`, data: null };
+    }
+    return { error: false, data: data.data || data, message: null };
+  } catch (err) {
+    return { error: true, message: err.message, data: null };
+  }
+}
+
+// Get user's profile
+async function chamiloGetUserProfile(username) {
+  return await chamiloApiCall('user_profile', { username: username || CHAMILO_USERNAME });
+}
+
+// Get all courses accessible to a user
+async function chamiloGetUserCourses(username) {
+  return await chamiloApiCall('get_courses', { username: username || CHAMILO_USERNAME });
+} 
   
   const phonePatterns = [
     /(?:alternative|other|contact|cell|phone|number|reach me).*?(?:is|:)?\s*(\d[\d\s]{8,})/i,
