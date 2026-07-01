@@ -148,56 +148,45 @@ function getContext(phone) {
     DB.context[phone] = { last_intent: '', last_course_mentioned: '', course_interest: '', message_history: [], stage: 'greeting', lead_info: {}, last_activity: new Date().toISOString() };
   }
   return DB.context[phone];
+// Step 1: Authenticate to get dynamic apiKey
+async function chamiloAuthenticate() {
+  if (!CHAMILO_API_URL || !CHAMILO_USERNAME || !CHAMILO_PASSWORD) {
+    chamiloSession.lastError = 'Chamilo credentials not configured';
+    return null;
+  }
+  try {
+    const res = await fetch(`${CHAMILO_API_URL}v2.php`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'authenticate',
+        username: CHAMILO_USERNAME,
+        password: CHAMILO_PASSWORD
+      })
+    });
+    const data = await res.json();
+    if (data.error === false && data.data && data.data.apiKey) {
+      chamiloSession.apiKey = data.data.apiKey;
+      chamiloSession.expires = Date.now() + (25 * 60 * 1000);
+      chamiloSession.lastError = null;
+      const profile = await chamiloApiCall('user_profile', { username: CHAMILO_USERNAME });
+      if (profile && !profile.error) {
+        chamiloSession.userProfile = profile.data;
+        console.log('Chamilo LMS: Authenticated as', profile.data.fullName || CHAMILO_USERNAME);
+      } else {
+        console.log('Chamilo LMS: Authenticated successfully');
+      }
+      return chamiloSession.apiKey;
+    }
+    chamiloSession.lastError = data.message || 'Authentication failed';
+    console.error('Chamilo auth failed:', data.message || 'Unknown error');
+    return null;
+  } catch (err) {
+    chamiloSession.lastError = err.message;
+    console.error('Chamilo auth error:', err.message);
+    return null;
+  }
 }
-
-function updateContext(phone, intent, courseMentioned, studentMessage, leratoReply) {
-  const ctx = getContext(phone);
-  ctx.last_intent = intent;
-  ctx.last_activity = new Date().toISOString();
-  if (courseMentioned) {
-    ctx.last_course_mentioned = courseMentioned;
-    ctx.course_interest = courseMentioned;
-  }
-  ctx.message_history.push({ role: 'student', msg: studentMessage, time: new Date().toISOString() });
-  ctx.message_history.push({ role: 'lerato', msg: leratoReply, time: new Date().toISOString() });
-  if (ctx.message_history.length > 50) ctx.message_history = ctx.message_history.slice(-50);
-  saveDB();
-}
-
-// ============================================================
-// DYNAMIC INTAKE DATE CALCULATOR
-// ============================================================
-function getIntakeInfo() {
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = now.getMonth(); // 0-indexed
-  const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-  
-  // Find Monday between 1st-5th of current month
-  let earlyIntake = null;
-  for (let d = 1; d <= 5; d++) {
-    const date = new Date(year, month, d);
-    if (date.getDay() === 1) { earlyIntake = date; break; }
-  }
-  
-  // Find Monday between 24th-31st of current month
-  let lateIntake = null;
-  const lastDay = new Date(year, month + 1, 0).getDate();
-  for (let d = 24; d <= lastDay; d++) {
-    const date = new Date(year, month, d);
-    if (date.getDay() === 1) { lateIntake = date; break; }
-  }
-  
-  // Find next month's early intake
-  let nextMonthIntake = null;
-  for (let d = 1; d <= 5; d++) {
-    const date = new Date(year, month + 1, d);
-    if (date.getDay() === 1) { nextMonthIntake = date; break; }
-  }
-  
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  
   // Determine which intake to promote (must be in the future)
   let currentIntake = null;
   let currentIntakeLabel = '';
