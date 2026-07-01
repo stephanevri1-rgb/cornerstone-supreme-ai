@@ -392,12 +392,6 @@ Which course are you interested in? I can give you the exact price!`;
       }
     }
   }
-${intake.urgencyMessage}
-
-What field are you currently in, or what career are you aiming for? I can recommend the best course for your goals. 😊`;
-      } else if (/\b(re5|re 5|regulatory exam|fais|fsca)\b/.test(lower)) {
-        response = `Did you know the RE 5 is a **legal requirement** for everyone in financial services in South Africa? Without it, you simply cannot work in the industry legally. Don't let your career be held back!
-
 We offer **two ways to prepare** for your RE 5 — both completed within 6 weeks:
 
 💻 **Online Learning — R1,000**
