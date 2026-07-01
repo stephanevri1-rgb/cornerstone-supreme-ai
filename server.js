@@ -647,7 +647,6 @@ This helps our management team prepare your registration pack with everything yo
 This will help me recommend the best programme for your goals. 😊`;
       }
       break;
-• **Full upfront payment only** — NO instalments for RE 5
 • Payment via EFT or at the office only
 • **NO e-commerce payment on the website**
 • Must be paid in full before the starting day
