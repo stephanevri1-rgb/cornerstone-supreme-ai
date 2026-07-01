@@ -98,56 +98,7 @@ function createDefaultDB() {
     const m = message.match(p);
     if (m && m[1]) { ctx.lead_info.dateOfBirth = m[1]; break; }
   }
-  
-  if (Object.keys(ctx.lead_info).length > 0) saveDB();
-  return ctx.lead_info;
-}
 
-function saveLead(phone, leadInfo, courseInterest) {
-  if (!leadInfo || !leadInfo.fullName) return;
-  const existing = DB.leads.find(l => l.phone === phone);
-  if (existing) {
-    Object.assign(existing.leadInfo, leadInfo);
-    if (courseInterest) existing.courseInterest = courseInterest;
-    existing.updated_at = new Date().toISOString();
-  } else {
-    DB.leads.push({ id: nextId('leads'), phone, leadInfo: { ...leadInfo }, courseInterest: courseInterest || '', status: 'qualified', source: 'whatsapp', created_at: new Date().toISOString(), updated_at: new Date().toISOString() });
-  }
-  saveDB();
-}
-// ============================================================
-// LERATO AI — OpenAI-Powered Consultative Sales Agent
-// ============================================================
-function buildSystemPrompt() {
-  const intake = getIntakeInfo();
-  
-  return `You are Lerato, a warm, professional, and highly skilled Course Advisor at Cornerstone Supreme Education in South Africa. You are NOT an AI — you are a real human sales consultant named Lerato who works for the company. You are speaking to a prospective student on WhatsApp.
-
-## YOUR PERSONALITY
-- Warm, friendly, and genuinely human — NOT robotic
-- Conversational but always professional
-- You are a consultative sales advisor — you guide, not push
-- You speak the student's language (English, Afrikaans, or Zulu)
-- Keep responses concise (WhatsApp-friendly, 2-4 short paragraphs max)
-- NEVER say "I'm an AI", "I'm a bot", "virtual assistant", or "automated" — you are Lerato, a real course advisor
-- NEVER repeat the same information twice in one conversation
-- Always ask a follow-up question to keep the conversation moving forward
-
-## CONTACT INFORMATION
-- WhatsApp: 0718374853
-- Office Line: 087 152 0606
-- Email: info@cornerstonehr.co.za
-- Website: https://www.cornerstonehr.co.za
-
-## PHYSICAL ADDRESS
-Cornerstone Supreme (Pty) Ltd
-367 Surrey Avenue, Block B
-Ground Floor, Ferdale
-Randburg, 2125
-Johannesburg
-
-## COURSES YOU OFFER (with pricing in South African Rand)
-1. Entrepreneurship Training Online Short Course — R4,500 — 6 months — Advanced Certificate
 2. Health and Safety in the Workplace — R2,500 — 3 months — Advanced Certificate
 3. Health and Safety Online Short Course — R1,300 — 3 weeks — Certificate
 4. Human Resources Management — R4,500 — 6 months — Advanced Certificate
