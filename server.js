@@ -248,56 +248,48 @@ async function chamiloGetUserCourses(username) {
     if (m) {
       const num = m[1] || m[0];
       if (num && num.replace(/\D/g, '').length >= 9) {
+// Get course details and content
+async function chamiloGetCourseDetails(courseId) {
+  return await chamiloApiCall('course_description', { course_id: courseId });
+}
 
-## CONVERSATION MEMORY AND CONTINUITY — CRITICAL
-You have access to the FULL conversation history with each learner. When a learner returns after being offline, you MUST:
-1. **Reference what was previously discussed** — e.g., "Welcome back, [Name]! Last time we spoke, you were interested in the [Course]. How are you progressing with your decision?"
-2. **NEVER start from scratch** — Do NOT re-ask for information they already provided (name, email, course interest, etc.)
-3. **Acknowledge their return** — Make them feel remembered and valued: "Great to hear from you again!"
-4. **Pick up where you left off** — If they were deciding between options, refer back to those options. If they said they'd think about it, ask <response clipped><NOTE>Result is longer than **10000 characters**, will be **truncated**.</NOTE>
-      } else {
-        response = `I'd love to help you get enrolled! Here's how it works:
+// Get student's course progress
+async function chamiloGetUserProgress(courseId, userId) {
+  return await chamiloApiCall('course_progress', { course_id: courseId, user_id: userId });
+}
 
-${intake.urgencyMessage}
+// Get student's gradebook results
+async function chamiloGetUserGrades(courseId, userId) {
+  return await chamiloApiCall('gradebook', { course_id: courseId, user_id: userId });
+}
 
-1️⃣ Visit https://www.cornerstonehr.co.za and select your course
-2️⃣ Click "Enrol Now" and fill in your details
-3️⃣ Choose your payment option (full payment = 5% discount, or monthly installments)
-4️⃣ You'll receive confirmation within 24 hours
+// Get quizzes/exercises in a course
+async function chamiloGetCourseExercises(courseId) {
+  return await chamiloApiCall('course_exercises', { course_id: courseId });
+}
 
-Or, if you'd like, I can have our management team send the registration documents directly to you. Just share:
-• Your full name and surname
-• Which course you're interested in
-• Your email address
+// Get student's exercise results
+async function chamiloGetExerciseResults(courseId, exerciseId, userId) {
+  return await chamiloApiCall('exercise_results', { course_id: courseId, exercise_id: exerciseId, user_id: userId });
+}
 
-Which course has caught your eye?`;
-      }
-      ctx.stage = 'lead_collection';
-      break;
+// Auto-authenticate on startup
+if (CHAMILO_API_URL && CHAMILO_USERNAME && CHAMILO_PASSWORD) {
+  console.log('Chamilo: Attempting authentication...');
+  chamiloAuthenticate();
+  setInterval(chamiloAuthenticate, 25 * 60 * 1000);
+}
 
-    case 'brochure':
-      response = `Absolutely! You can view all our course details on our website:
-https://www.cornerstonehr.co.za
+// ============================================================
+// tRPC HELPER
+// ============================================================
+function trpc(data) {
+  return { result: { data: { json: data } } };
+}
 
-But honestly, if you tell me which area you're interested in — Finance, Business & HR, or Healthcare — I can give you all the details right here, including pricing, duration, certification, and career prospects. It might save you some time!
-
-${intake.urgencyMessage}
-
-What field are you looking at?`;
-      break;
-
-    case 'payment_details':
-      response = `Great question! We have flexible payment options to suit your budget:
-
-💳 **Full Payment** — Pay upfront and get a **5% discount**
-📅 **Monthly Installments** — Spread the cost over the duration of your course
-🏢 **Employer-Sponsored** — Your company pays on your behalf
-
-Our banking details for EFT or direct deposit:
-
-🏦 Bank: FNB
-📋 Account Name: Cornerstone Supreme
-📋 Account Number: 62653109283
+function parseInput(req) {
+  return req.body?.json || req.body || {};
+}
 📋 Branch Code: 261750
 📋 SWIFT Code: FIRNZAJJ (for international payments)
 📝 Reference: Your Name
