@@ -398,106 +398,72 @@ We offer **two ways to prepare** for your RE 5 — both completed within 6 weeks
 Example Step 7 message: "Thank you so much, [Name]! To secure your place for the RE 5 programme starting [date], please complete your enrolment right now using this link: https://zjw4jz46ae4ok.kimi.page
 
   Once you've submitted the form, our management team will follow up with you via email and send you your Admission Letter, Invoice, and any additional documentation needed. Payment must be made in full upfront before the starting day.
+  if (!currentIntake && lateIntake) {
+    const lateDate = new Date(lateIntake);
+    lateDate.setHours(0, 0, 0, 0);
+    if (lateDate >= today) {
+      currentIntake = lateIntake;
+      currentIntakeLabel = `Monday, ${lateIntake.getDate()} ${monthNames[lateIntake.getMonth()]} ${lateIntake.getFullYear()}`;
+      const daysUntil = Math.ceil((lateIntake - today) / (1000 * 60 * 60 * 24));
+      if (daysUntil <= 7) {
+        urgencyMessage = `Our next intake is coming up very soon — ${currentIntakeLabel}. Spaces are filling up, so I'd recommend registering now to secure your place.`;
+      } else {
+        urgencyMessage = `Our next intake is on ${currentIntakeLabel}. Registering now gives you plenty of time to get everything sorted before classes begin.`;
+      }
+    }
+  }
+  
+  if (!currentIntake && nextMonthIntake) {
+    currentIntake = nextMonthIntake;
+    currentIntakeLabel = `Monday, ${nextMonthIntake.getDate()} ${monthNames[nextMonthIntake.getMonth()]} ${nextMonthIntake.getFullYear()}`;
+    urgencyMessage = `Our next intake is on ${currentIntakeLabel}. Registering now means you'll be all set to start fresh — and you won't miss this opportunity.`;
+  }
+  
+  return {
+    currentIntake,
+    currentIntakeLabel,
+    urgencyMessage,
+    earlyIntakeLabel: earlyIntake ? `${earlyIntake.getDate()} ${monthNames[earlyIntake.getMonth()]}` : null,
+    lateIntakeLabel: lateIntake ? `${lateIntake.getDate()} ${monthNames[lateIntake.getMonth()]}` : null
+  };
+}
 
-  Is there anything else I can help you with in the meantime?"
-
-  **REMEMBER:** For RE 5 enquiries ONLY, YOU share the enrolment link directly. For all other courses, management sends the registration form via email.
-
-KEY: Do not overwhelm. One step at a time. Each message should move the prospect closer to a decision.
-
-### RE 1 vs RE 5 — ACCURATE INFORMATION (DO NOT GET THIS WRONG):
-Cornerstone Supreme offers RE 5 preparation. If asked about RE 1 vs RE 5, here is the CORRECT information:
-
-- **RE 1**: For **Key Individuals (KIs)** — those in management/supervisory roles who oversee a financial services practice
-- **RE 5**: For **Representatives** — individual financial advisors who provide financial advice to clients
-
-**DO NOT mix these up.** RE 1 is NOT for entry-level and RE 5 is NOT for management — that is backwards and wrong. If unsure, refer the prospect to management rather than guessing.
-
-### RE 5 INTAKE DATES (THIS MONTH):
-• 22nd of this month
-• 29th of this month
-Learner should decide which date suits them. Payment must be made in full upfront before the starting day.
-
-## WEBSITE AND LMS ACCESS
-• Main Website: www.cornerstonehr.co.za
-• LMS Login (study kit): www.cornerstonehr.co.za/lms
-• Alternative LMS: www.cornerstonehr.co.za/learn
-
-## CURRENT INTAKE INFORMATION (AUTOMATICALLY UPDATED)
-${intake.urgencyMessage}
-
-When discussing intakes:
-- ALWAYS present the current intake as the relevant registration opportunity
-- Create a sense of urgency — spaces are limited
-- Guide prospects toward securing their place NOW
-- Do NOT mention that bookings happen every month
-- Do NOT reveal the full intake schedule
-- Focus on the current intake period only
-- Use phrases like "our upcoming intake", "the next available intake", "register now to secure your spot"
-
-## BANKING DETAILS
-Bank: FNB | Account Name: Cornerstone Supreme | Account Number: 62653109283 | Branch Code: 261750 | SWIFT Code: FIRNZAJJ (for international payments)
-Reference: Your Name
-Send proof of payment to stephane@cornerstonehr.co.za
-
-## PAYMENT METHODS — COURSE-SPECIFIC (DO NOT GUESS — USE THE EXACT PAYMENT STRUCTURE FOR EACH COURSE)
-
-### CRITICAL RULE:
-**ONLY the RE 5 Regulatory Examination Preparation requires full upfront payment.** All other courses offer deposit + instalment options. NEVER assume a course requires full upfront payment unless it is RE 5. When a prospect asks about payment for a specific course, give them the EXACT payment structure from below.
-
----
-
-### 1. ENTREPRENEURSHIP TRAINING — R4,500 (6 months)
-• Deposit: R1,000 (payable before commencing to secure your place)
-• Monthly Instalment: R700 x 5 months after the deposit
-• Total: R1,000 + (R700 x 5) = R4,500
-• Format: R1,000 deposit + 5 monthly instalments of R700
-
-### 2. HEALTH AND SAFETY IN THE WORKPLACE — R2,500 (3 months)
-• Deposit: R1,100 (required before commencing training)
-• Monthly Instalment: R700 x 2 months after the deposit
-• Total: R1,100 + R700 + R700 = R2,500
-• Format: R1,100 deposit + 2 monthly instalments of R700
-
-### 3. HEALTH AND SAFETY ONLINE SHORT COURSE — R1,300 (3 weeks)
-• Deposit: R800 (required before commencing training)
-• Final Payment: R500 (due in week 3, before the final exam)
-• Total: R800 + R500 = R1,300
-• Format: R800 deposit + R500 final payment in week 3
-
-### 4. HUMAN RESOURCES MANAGEMENT — R4,500 (6 months)
-• Deposit: R1,000 (payable before commencing to secure your enrolment)
-• Monthly Instalment: R700 x 3 months after the deposit
-• Total: R1,000 + (R700 x 3) = R3,100 paid over 4 months. Balance settled within the 6-month training period.
-• Format: R1,000 deposit + 3 monthly instalments of R700
-
-### 5. LOGISTICS AND SUPPLY CHAIN MANAGEMENT — R4,500 (6 months)
-• Deposit: R1,000 (required upfront before commencing training)
-• Monthly Instalment: R700 x 5 months after the deposit
-• Total: R4,500
-• Format: R1,000 deposit + 5 monthly instalments of R700
-
-### 6. MEDICAL CALL CENTRE TRAINING — R3,500 (3 months)
-• Deposit: R1,500 (initial deposit to secure your place)
-• Monthly Instalment: R1,000 x 3 months after the deposit
-• Total: R1,500 + (R1,000 x 3) = R4,500
-• Format: R1,500 deposit + 3 monthly instalments of R1,000
-
-### 7. NATIONAL CERTIFICATE FINANCIAL MARKETS NQF 6 — R22,000 (12 months)
-• Deposit: R2,000 (initial deposit to secure your place)
-• Monthly Instalment: R2,000 x 10 months
-• Total: R22,000
-• Format: R2,000 deposit + 10 monthly instalments of R2,000
-
-### 8. ONLINE ADVANCED BUSINESS ADMINISTRATION — R4,500 (6 months)
-• Deposit: R1,000 (to be paid before commencing training)
-• Monthly Instalment: R700 x 5 months after the deposit
-• Total: R4,500
-• Format: R1,000 deposit + 5 monthly instalments of R700
-
-### 9. PROFESSIONAL RECEPTIONIST — R4,500 (6 months)
-• Deposit: R1,000 (pay before commencing training to secure your place)
-• Monthly Instalment: R700 x 5 months after your deposit
+// ============================================================
+// LEAD INFO EXTRACTION
+// ============================================================
+function extractLeadInfo(phone, message) {
+  const ctx = getContext(phone);
+  if (!ctx.lead_info) ctx.lead_info = {};
+  
+  const namePatterns = [
+    /(?:my name is|i am|i'm|call me|this is)\s+([A-Za-z\s]+?)(?:\.|,|$|\n|\d)/i,
+    /(?:full name|name and surname)\s*:?\s*([A-Za-z\s]+?)(?:\.|,|$|\n|\d)/i
+  ];
+  for (const p of namePatterns) {
+    const m = message.match(p);
+    if (m && m[1] && m[1].trim().length > 2) {
+      ctx.lead_info.fullName = m[1].trim();
+      break;
+    }
+  }
+  
+  const emailMatch = message.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
+  if (emailMatch) ctx.lead_info.email = emailMatch[0];
+  
+  const phonePatterns = [
+    /(?:alternative|other|contact|cell|phone|number|reach me).*?(?:is|:)?\s*(\d[\d\s]{8,})/i,
+    /(?:\+?27|0)[\s\d]{9,}/
+  ];
+  for (const p of phonePatterns) {
+    const m = message.match(p);
+    if (m) {
+      const num = m[1] || m[0];
+      if (num && num.replace(/\D/g, '').length >= 9) {
+        ctx.lead_info.altPhone = num.trim();
+        break;
+      }
+    }
+  }
 • Total: R4,500
 • Format: R1,000 deposit + 5 monthly instalments of R700
 
