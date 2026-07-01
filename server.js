@@ -392,13 +392,6 @@ Which course are you interested in? I can give you the exact price!`;
       }
     }
   }
-• **Financial Markets NQF 6** → Investment firms, financial analysis, wealth management
-• **HR Management** → HR departments across all industries
-• **Medical Call Centre** → Healthcare administration, hospital call centres
-• **Business Administration** → Office management, operations, administration
-
-Many of our students study while working and use their new qualification to advance in their current role or switch careers.
-
 ${intake.urgencyMessage}
 
 What field are you currently in, or what career are you aiming for? I can recommend the best course for your goals. 😊`;
