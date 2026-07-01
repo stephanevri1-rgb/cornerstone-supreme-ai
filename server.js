@@ -98,56 +98,35 @@ function createDefaultDB() {
     const m = message.match(p);
     if (m && m[1]) { ctx.lead_info.dateOfBirth = m[1]; break; }
   }
-
-2. Health and Safety in the Workplace — R2,500 — 3 months — Advanced Certificate
-3. Health and Safety Online Short Course — R1,300 — 3 weeks — Certificate
-4. Human Resources Management — R4,500 — 6 months — Advanced Certificate
-5. Logistics and Supply Chain Management — R4,500 — 6 months — Advanced Certificate
-6. Medical Call Centre Training — R3,500 — 3 months — Certificate
-7. National Certificate Financial Markets and Instruments NQF 6 — R22,000 — 12 months — National Certificate
-8. Online Advanced Business Administration — R4,500 — 6 months — Advanced Certificate
-9. Professional Receptionist Online Short Course — R4,500 — 6 months — Advanced Certificate
-10. RE 5 Regulatory Examination Preparation (Online) — R1,000 — 6 weeks — Certificate of Completion
-11. RE 5 Regulatory Examination Preparation (Face-to-Face) — R1,500 — 6 weeks — Certificate of Completion
-12. Risk Management Training Programme — R6,000 — 3 weeks — Certificate of Competence
-13. National Certificate Banking NQF 5 — R12,000 — 12 months — National Certificate (BankSETA Accredited)
-
-## RE 5 REGULATORY EXAMINATION PREPARATION — SPECIAL DETAILED INFORMATION
-The RE 5 is a **mandatory legal requirement** for all financial services providers in South Africa. Without it, you cannot legally operate in the financial services industry. This is a powerful motivator — lead with the problem.
-
-### TWO LEARNING OPTIONS:
-
-**Option A — Online Preparation: R1,000**
-• Face-to-face and online blended learning experience
-• Full coverage of all 10 RE 5 modules
-• Live facilitator-led training sessions
-• Access to experienced instructors throughout the programme
-• Comprehensive study guides and practice examinations
-• Web pocket quick learning platform
-• Podcasts and revision support material
-return await chamiloApiCall('gradebook', { course_id: courseId, user_id: userId });
+function nextId(table) {
+  if (!DB._nextId[table]) DB._nextId[table] = 1;
+  return DB._nextId[table]++;
 }
 
-// Get quizzes/exercises in a course
-async function chamiloGetCourseExercises(courseId) {
-  return await chamiloApiCall('course_exercises', { course_id: courseId });
-}
+process.on('exit', () => saveDB());
+process.on('SIGINT', () => { saveDB(); process.exit(0); });
+process.on('SIGTERM', () => { saveDB(); process.exit(0); });
+setInterval(saveDB, 30000);
 
-// Get student's exercise results
-async function chamiloGetExerciseResults(courseId, exerciseId, userId) {
-  return await chamiloApiCall('exercise_results', { course_id: courseId, exercise_id: exerciseId, user_id: userId });
-}
-
-// Auto-authenticate on startup
-if (CHAMILO_API_URL && CHAMILO_USERNAME && CHAMILO_PASSWORD) {
-  console.log('Chamilo: Attempting authentication...');
-  chamiloAuthenticate();
-  setInterval(chamiloAuthenticate, 25 * 60 * 1000);
-}
+console.log('Database loaded. Courses:', DB.courses.length);
 
 // ============================================================
-// tRPC HELPER
+// CHAMILO LMS 1.11.32 INTEGRATION
 // ============================================================
+// CRITICAL: Chamilo v2.php uses api_key (underscore), NOT apiKey (camelCase)
+// The authenticate action returns apiKey (camelCase) but data actions need api_key
+// Most data actions also require the username parameter
+//
+// ENV VARIABLES NEEDED on Render:
+//   CHAMILO_API_URL=https://www.cornerstonehr.co.za/lms/main/webservices/api/
+//   CHAMILO_USERNAME=LeratoAI
+//   CHAMILO_PASSWORD=n22OmXMi
+
+const CHAMILO_API_URL = process.env.CHAMILO_API_URL || '';
+const CHAMILO_USERNAME = process.env.CHAMILO_USERNAME || '';
+const CHAMILO_PASSWORD = process.env.CHAMILO_PASSWORD || '';
+
+let chamiloSession = { apiKey: null, expires: 0, lastError: null, userProfile: null };
 function trpc(data) {
   return { result: { data: { json: data } } };
 }
