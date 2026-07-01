@@ -1692,222 +1692,221 @@ app.get('/api/brochures/:id', (req, res) => {
   res.set('Content-Type', b.mime_type);
   res.set('Content-Disposition', `inline; filename="${b.filename}"`);
   res.send(binary);
-});Could you also share with me:
-• Your full name and surname
-• Your email address
-• An alternative contact number
+// LEADS API
+app.post('/api/trpc/leads.list', (req, res) => {
+  res.json(trpc([...DB.leads].sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at))));
+});
 
-This way we can have everything prepared for you right away! 😊`;
-        } else {
-          response = `Excellent choice! The ${relevantCourse.title} is a fantastic programme. Here's how to get started:
+app.post('/api/trpc/leads.create', (req, res) => {
+  const input = parseInput(req);
+  const lead = {
+    id: nextId('leads'),
+    phone: input.phone || '',
+    leadInfo: input.leadInfo || {},
+    courseInterest: input.courseInterest || '',
+    status: input.status || 'qualified',
+    source: input.source || 'manual',
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  };
+  DB.leads.push(lead); saveDB();
+  res.json(trpc({ id: lead.id }));
+});
 
-${intake.urgencyMessage}
+app.post('/api/trpc/leads.updateStatus', (req, res) => {
+  const input = parseInput(req);
+  const lead = DB.leads.find(l => l.id === input.id);
+  if (lead) { lead.status = input.status; lead.updated_at = new Date().toISOString(); saveDB(); }
+  res.json(trpc({ success: true }));
+});
 
-To register, simply:
-1️⃣ Visit https://www.cornerstonehr.co.za and click "Enrol Now"
-2️⃣ Fill in your details
-3️⃣ Choose your preferred payment option
-4️⃣ Our team will send you confirmation within 24 hours
+app.post('/api/trpc/leads.clearAll', (req, res) => {
+  DB.leads = [];
+  saveDB();
+  res.json(trpc({ success: true, deleted: true }));
+});
 
-Or, to make it even easier, I can pass your details directly to our management team and they'll send you the registration form and invoice. 
+// SCREENSHOT UPLOAD ENDPOINTS
+app.post('/api/trpc/leads.uploadScreenshot', (req, res) => {
+  const input = parseInput(req);
+  const screenshot = {
+    id: nextId('screenshots'),
+    name: input.name,
+    filename: input.filename,
+    mime_type: input.mimeType,
+    size: input.size,
+    data: input.data,
+    created_at: new Date().toISOString()
+  };
+  DB.screenshots.push(screenshot);
+  saveDB();
+  res.json(trpc({ id: screenshot.id, success: true }));
+});
 
-Could you share with me:
-• Your full name and surname
-• Your email address
-• An alternative contact number
+app.post('/api/trpc/leads.listScreenshots', (req, res) => {
+  res.json(trpc([...DB.screenshots].reverse().map(s => ({
+    id: s.id,
+    name: s.name,
+    filename: s.filename,
+    mime_type: s.mime_type,
+    size: s.size,
+    created_at: s.created_at
+  }))));
+});
 
-This way we can get everything prepared for you right away!`;
-        }
-      } else {
-        response = `I'd love to help you get enrolled! Here's how it works:
+app.post('/api/trpc/leads.deleteScreenshot', (req, res) => {
+  const input = parseInput(req);
+  DB.screenshots = DB.screenshots.filter(s => s.id !== input.id);
+  saveDB();
+  res.json(trpc({ success: true }));
+});
 
-${intake.urgencyMessage}
+app.get('/api/screenshots/:id', (req, res) => {
+  const s = DB.screenshots.find(s => s.id === parseInt(req.params.id));
+  if (!s) return res.status(404).send('Not found');
+  const binary = Buffer.from(s.data, 'base64');
+  res.set('Content-Type', s.mime_type);
+  res.set('Content-Disposition', `inline; filename="${s.filename}"`);
+  res.send(binary);
+});
 
-1️⃣ Visit https://www.cornerstonehr.co.za and select your course
-2️⃣ Click "Enrol Now" and fill in your details
-3️⃣ Choose your payment option — most courses offer a deposit + monthly instalment plan (only RE 5 requires full upfront payment)
-4️⃣ You'll receive confirmation within 24 hours
+// CHAMILO LMS API ENDPOINTS
+app.post('/api/trpc/lms.status', async (req, res) => {
+  const apiKey = await chamiloGetApiKey();
+  const userName = chamiloSession.userProfile ? chamiloSession.userProfile.fullName : CHAMILO_USERNAME;
+  res.json(trpc({
+    authenticated: !!apiKey,
+    userName: userName,
+    userId: chamiloSession.userProfile ? chamiloSession.userProfile.id : null,
+    url: CHAMILO_API_URL ? CHAMILO_API_URL.replace(/\/+$/, '') : '',
+    username: CHAMILO_USERNAME || '',
+    lastError: chamiloSession.lastError || null
+  }));
+});
 
-Or, if you'd like, I can have our management team send the registration documents directly to you. Just share:
-• Your full name and surname
-• Which course you're interested in
-• Your email address
+app.post('/api/trpc/lms.getUserProfile', async (req, res) => {
+  const input = parseInput(req);
+  const result = await chamiloGetUserProfile(input.username);
+  res.json(trpc(result.error ? { error: result.message } : result.data));
+});
 
-Which course has caught your eye?`;
-      }
-      ctx.stage = 'lead_collection';
-      break;
+app.post('/api/trpc/lms.getUserCourses', async (req, res) => {
+  const input = parseInput(req);
+  const result = await chamiloGetUserCourses(input.username);
+  res.json(trpc(result.error ? { error: result.message } : (result.data || [])));
+});
 
-    case 'brochure':
-      response = `Absolutely! You can view all our course details on our website:
-https://www.cornerstonehr.co.za
+app.post('/api/trpc/lms.getCourseDetails', async (req, res) => {
+  const input = parseInput(req);
+  const result = await chamiloGetCourseDetails(input.courseId);
+  res.json(trpc(result.error ? { error: result.message } : (result.data || {})));
+});
 
-But honestly, if you tell me which area you're interested in — Finance, Business & HR, or Healthcare — I can give you all the details right here, including pricing, duration, certification, and career prospects. It might save you some time!
+app.post('/api/trpc/lms.getUserProgress', async (req, res) => {
+  const input = parseInput(req);
+  const result = await chamiloGetUserProgress(input.courseId, input.userId);
+  res.json(trpc(result.error ? { error: result.message } : (result.data || {})));
+});
 
-${intake.urgencyMessage}
+app.post('/api/trpc/lms.getUserGrades', async (req, res) => {
+  const input = parseInput(req);
+  const result = await chamiloGetUserGrades(input.courseId, input.userId);
+  res.json(trpc(result.error ? { error: result.message } : (result.data || {})));
+});
 
-What field are you looking at?`;
-      break;
+app.post('/api/trpc/lms.getCourseExercises', async (req, res) => {
+  const input = parseInput(req);
+  const result = await chamiloGetCourseExercises(input.courseId);
+  res.json(trpc(result.error ? { error: result.message } : (result.data || [])));
+});
 
-    case 'payment_details':
-      response = `Great question! We have flexible payment options to suit your budget:
+app.post('/api/trpc/lms.getExerciseResults', async (req, res) => {
+  const input = parseInput(req);
+  const result = await chamiloGetExerciseResults(input.courseId, input.exerciseId, input.userId);
+  res.json(trpc(result.error ? { error: result.message } : (result.data || {})));
+});
 
-📅 **Flexible Payment Plan** — Deposit + monthly instalments for most courses (except RE 5 which is full upfront)
-🏢 **Employer-Sponsored** — Your company pays on your behalf
+app.post('/api/trpc/company.getSettings', (req, res) => res.json(trpc(DB.settings)));
+app.post('/api/trpc/company.update', (req, res) => {
+  const input = parseInput(req);
+  for (const [key, value] of Object.entries(input)) {
+    if (value !== undefined) DB.settings[key] = value;
+  }
+  saveDB();
+  res.json(trpc({ success: true }));
+});
 
-Our banking details for EFT or direct deposit:
+app.post('/api/trpc/agents.list', (req, res) => {
+  res.json(trpc([
+    { agentId: 'intent_detector', name: 'Intent Detector', isActive: true },
+    { agentId: 'context_analyzer', name: 'Context Analyzer', isActive: true },
+    { agentId: 'sales_responder', name: 'Sales Advisor (Lerato)', isActive: true },
+    { agentId: 'objection_handler', name: 'Objection Handler', isActive: true },
+    { agentId: 'follow_up', name: 'Follow-up Agent', isActive: true },
+    { agentId: 'language_adapter', name: 'Language Adapter', isActive: true },
+    { agentId: 'post_enrollment', name: 'Student Success', isActive: true },
+    { agentId: 'prospector', name: 'Outbound Sales', isActive: true },
+  ]));
+});
 
-🏦 Bank: FNB
-📋 Account Name: Cornerstone Supreme
-📋 Account Number: 62653109283
-📋 Branch Code: 261750
-📋 SWIFT Code: FIRNZAJJ (for international payments)
-📝 Reference: Your Name
+app.post('/api/trpc/analytics.getStats', (req, res) => {
+  res.json(trpc({
+    totalConversations: DB.conversations.length,
+    activeConversations: DB.conversations.filter(c => c.status === 'active').length,
+    enrolledCount: DB.conversations.filter(c => c.status === 'enrolled').length,
+    totalLeads: DB.leads.length,
+    conversionRate: DB.conversations.length > 0 ? ((DB.conversations.filter(c => c.status === 'enrolled').length / DB.conversations.length) * 100).toFixed(1) + '%' : '0%',
+  }));
+});
 
-Once you've paid, email your proof of payment to stephane@cornerstonehr.co.za
-${intake.urgencyMessage}
+// ---- WHATSAPP WEBHOOK ----
+app.get('/api/webhook/whatsapp', (req, res) => {
+  const mode = req.query['hub.mode'];
+  const token = req.query['hub.verify_token'];
+  const challenge = req.query['hub.challenge'];
+  if (mode === 'subscribe' && token === WEBHOOK_VERIFY_TOKEN) {
+    res.status(200).send(challenge);
+  } else {
+    res.sendStatus(403);
+  }
+});
 
-Would you like me to help you choose a course, or do you have other questions? 😊`;
-      break;
+app.post('/api/webhook/whatsapp', async (req, res) => {
+  res.sendStatus(200);
+  try {
+    const messages = req.body?.entry?.[0]?.changes?.[0]?.value?.messages;
+    if (!messages || messages.length === 0) return;
+    const msg = messages[0];
+    const from = msg.from;
+    const text = msg.text?.body || '';
+    const name = msg.contacts?.[0]?.profile?.name || 'Student';
+    console.log(`[IN] ${from}: ${text}`);
+    const { response, intent, lang } = await generateAIResponse(text, from);
+    saveConversation(from, name, text, response, intent, lang);
+    await sendWhatsAppMessage(from, response);
+    console.log(`[OUT] ${from}: ${response.substring(0, 80)}...`);
+  } catch (err) {
+    console.error('Webhook error:', err.message);
+  }
+});
 
-    case 'intake_dates':
-      response = `${intake.urgencyMessage}
+// STATIC FILES
+const publicPath = path.join(__dirname, 'public');
+app.use(express.static(publicPath));
+app.get('*', (req, res) => res.sendFile(path.join(publicPath, 'index.html')));
 
-I'd really encourage you to register as soon as possible so we can secure your spot and get your study materials prepared. Would you like me to help you get the registration process started? 
-
-I can have our management team send you the registration form and invoice directly. Just share your full name, email, and which course you're interested in, and we'll take care of the rest! 😊`;
-      break;
-
-    case 'contact':
-      response = `You can reach us in a few ways:
-
-📱 WhatsApp: 0718374853
-☎️ Office Line: 087 152 0606
-📧 Email: stephane@cornerstonehr.co.za
-🌐 Website: https://www.cornerstonehr.co.za
-
-📍 Our Office:
-Cornerstone Supreme (Pty) Ltd
-367 Surrey Avenue, Block B
-Ground Floor, Ferdale
-Randburg, 2125
-Johannesburg
-
-Is there something specific I can help you with right now? 😊`;
-      break;
-
-    default:
-      if (/\b(pay|payment|installment|deposit|eft|transfer)\b/.test(lower)) {
-        response = `Most of our courses offer a **flexible deposit + monthly instalment plan** to make your investment manageable. Only the RE 5 Regulatory Examination Preparation requires full upfront payment.
-
-To give you the exact payment breakdown, could you let me know which course you're interested in? Each programme has its own specific deposit and instalment structure.
-
-Our banking details for any payment:
-🏦 Bank: FNB
-📋 Account Name: Cornerstone Supreme
-📋 Account Number: 62653109283
-📋 Branch Code: 261750
-📋 SWIFT Code: FIRNZAJJ (for international payments)
-📝 Reference: Your Name
-
-Send proof of payment to stephane@cornerstonehr.co.za
-
-Which course would you like the payment plan for? 😊`;
-      } else if (/\b(address|location|office|where are you|visit|physical|postal|direction)\b/.test(lower)) {
-        response = `Our office is located at:
-
-📍 Cornerstone Supreme (Pty) Ltd
-367 Surrey Avenue, Block B
-Ground Floor, Ferdale
-Randburg, 2125
-Johannesburg
-
-You can also reach us on:
-📱 WhatsApp: 0718374853
-☎️ Office: 087 152 0606
-📧 Email: stephane@cornerstonehr.co.za
-
-Would you like to book a visit or do you have questions about our courses?`;
-      } else if (/\b(requirement|need|matric|grade|qualification|entry requirement)\b/.test(lower)) {
-        response = `Most of our courses require a Matric certificate and basic computer literacy. For the NQF 5 and NQF 6 qualifications, work experience in the field is a plus but not always required.
-
-${intake.urgencyMessage}
-
-Which course are you interested in? I can tell you the specific requirements for that one, and we can check if you're a good fit. 😊`;
-      } else if (/\b(duration|how long|period|time)\b/.test(lower)) {
-        if (relevantCourse) {
-          response = `The ${relevantCourse.title} runs for ${relevantCourse.duration}. All sessions are conducted online via live virtual classes, so you can study from anywhere in South Africa with flexible scheduling.
-
-Recorded sessions are also available if you miss a live class, which is great if you're working while studying.
-
-${intake.urgencyMessage}
-
-Would you like to know about the payment options or registration process for this course?`;
-        } else {
-          response = `Our courses range from 3 weeks to 12 months:
-• Short Certificate Courses: 3 weeks – 3 months
-• Advanced Certificate Programmes: 6 months
-• National Certificates (NQF 5 & 6): 12 months
-
-All are online with flexible scheduling. ${intake.urgencyMessage} Which course would you like to know about?`;
-        }
-      } else if (/\b(cert|certificate|accredited|nqf|saqa|recognised|recognized)\b/.test(lower)) {
-        response = `Our programmes offer recognised certifications. Here's the breakdown:
-
-🏆 **National Certificate: Banking NQF 5** — Our ONLY BANKSETA-accredited programme (SAQA ID 20186, NQF Level 5, 120 credits). Certificate issued through BANKSETA.
-📜 **National Certificate: Financial Markets NQF 6** — SAQA-registered qualification (NQF Level 6) — NQF-aligned.
-🎓 **All other courses** — Professionally recognised short courses with Advanced Certificates. Valued by reputable organisations for skills development, though they do not carry NQF credits.
-
-After completion, you'll receive:
-🎓 Your official certificate
-📁 A skills portfolio
-📝 A reference letter (on request)
-
-${intake.urgencyMessage} Which course are you looking at?`;
-      } else if (/\b(job|work|career|employment|opportunity|salary|earn)\b/.test(lower)) {
-        response = `Great question! Our programmes are designed to open doors in the job market. For example:
-
-• **Banking NQF 5** → Commercial banks, lending institutions, regulatory departments
-• **Financial Markets NQF 6** → Investment firms, financial analysis, wealth management
-• **HR Management** → HR departments across all industries
-• **Medical Call Centre** → Healthcare administration, hospital call centres
-• **Business Administration** → Office management, operations, administration
-
-Many of our students study while working and use their new qualification to advance in their current role or switch careers.
-
-${intake.urgencyMessage}
-
-What field are you currently in, or what career are you aiming for? I can recommend the best course for your goals. 😊`;
-      } else if (/\b(re\s*1\b|rei|key individual|ki exam)\b/.test(lower) && !/\bre\s*5\b/.test(lower)) {
-        response = `The RE 1 is for **Key Individuals (KIs)** — those in management or supervisory roles who oversee a financial services practice. It's different from the RE 5, which is for Representatives who give financial advice to clients.
-
-At Cornerstone Supreme, we specialise in **RE 5 preparation** for representatives. For RE 1, I'd recommend speaking directly with our management team who can give you the most accurate guidance.
-
-You can reach them on:
-☎️ Office: 087 152 0606
-📧 Email: stephane@cornerstonehr.co.za
-
-Is there anything else about our RE 5 programme I can help you with? 😊`;
-      } else if (/\b(re5|re 5|regulatory exam|fais|fsca)\b/.test(lower)) {
-        response = `Did you know the RE 5 is a **legal requirement** for everyone in financial services in South Africa? Without it, you simply cannot work in the industry legally. Don't let your career be held back!
-
-We offer **two ways to prepare** for your RE 5 — both completed within 6 weeks:
-
-💻 **Online Learning — R1,000**
-Study from anywhere with live facilitator-led sessions, comprehensive study guides, mock exams, 24/7 recorded sessions, podcasts, video explainers, and full coverage of all 10 RE 5 modules.
-
-🏢 **Face-to-Face Learning — R1,500**
-Everything in the online programme PLUS you attend in-person sessions every Monday for 6 weeks at our Randburg office (367 Surrey Avenue, Ground Floor, Block B).
-
-**Which study method would you prefer — Online Learning or Face-to-Face Learning?** 😊`;
-        ctx.stage = 're5_method_selection';
-      } else if (ctx.stage === 're5_method_selection' && /\b(online|face|face-to-face|face to face)\b/.test(lower)) {
-        const method = /\b(face|face-to-face|face to face)\b/.test(lower) ? 'Face-to-Face' : 'Online';
-        const price = /\b(face|face-to-face|face to face)\b/.test(lower) ? 'R1,500' : 'R1,000';
-        response = `Great choice! The ${method} programme at ${price} is an excellent way to prepare. We've helped hundreds of candidates pass their RE 5 — you'll be in great hands!
-
-Now, we currently have available intakes starting on:
-📅 **22 June 2026**
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log('='.repeat(60));
+  console.log('  Cornerstone Supreme AI - Lerato is LIVE');
+  console.log('  AI Mode:', OPENAI_API_KEY ? 'GPT-4o Mini (Smart)' : 'Rule-Based');
+  console.log('  Port:', PORT);
+  console.log('  Courses:', DB.courses.length);
+  console.log('  Chamilo LMS:', CHAMILO_API_URL ? 'Configured (' + CHAMILO_API_URL + ')' : 'Not configured');
+  console.log('  Chamilo Auth:', CHAMILO_USERNAME ? 'Using ' + CHAMILO_USERNAME : 'No credentials');
+  console.log('  WhatsApp: /api/webhook/whatsapp');
+  console.log('='.repeat(60));
+});
 📅 **29 June 2026**
 
 Spaces are limited, so I recommend securing your spot quickly.
