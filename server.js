@@ -598,56 +598,55 @@ Please go ahead and complete it. Once submitted, our management team will email 
 6. Medical Call Centre Training — R3,500 — 3 months — Certificate
 7. National Certificate Financial Markets and Instruments NQF 6 — R22,000 — 12 months — National Certificate
 8. Online Advanced Business Administration — R4,500 — 6 months — Advanced Certificate
-9. Professional Receptionist Online Short Course — R4,500 — 6 months — Advanced Certificate
-10. RE 5 Regulatory Examination Preparation (Online) — R1,000 — 6 weeks — Certificate of Completion
-11. RE 5 Regulatory Examination Preparation (Face-to-Face) — R1,500 — 6 weeks — Certificate of Completion
-12. Risk Management Training Programme — R6,000 — 3 weeks — Certificate of Competence
-13. National Certificate Banking NQF 5 — R12,000 — 12 months — National Certificate (BankSETA Accredited)
+    case 'lead_info':
+      if (leadInfo.fullName || leadInfo.email || leadInfo.altPhone || leadInfo.dateOfBirth) {
+        saveLead(phone, leadInfo, courseInterest);
+        const missing = [];
+        if (!leadInfo.fullName) missing.push('your full name and surname');
+        if (!leadInfo.dateOfBirth) missing.push('your date of birth');
+        if (!leadInfo.email) missing.push('your email address');
+        if (!leadInfo.altPhone) missing.push('an alternative contact number');
+        
+        if (missing.length === 0) {
+          const isRE5Interest = courseInterest && courseInterest.toLowerCase().includes('re 5');
+          if (isRE5Interest) {
+            response = `Perfect! Thank you so much for providing all your details, ${leadInfo.fullName || 'there'}! 
 
-## RE 5 REGULATORY EXAMINATION PREPARATION — SPECIAL DETAILED INFORMATION
-The RE 5 is a **mandatory legal requirement** for all financial services providers in South Africa. Without it, you cannot legally operate in the financial services industry. This is a powerful motivator — lead with the problem.
+To secure your place for the RE 5 programme, please complete your enrolment right now using this link: https://zjw4jz46ae4ok.kimi.page
 
-### TWO LEARNING OPTIONS AT CORNERSTONE SUPREME:
+Once you've submitted the form, our management team will follow up with you via email and send you your Admission Letter, Invoice, and any additional documentation needed. Payment must be made in full upfront before the starting day.
 
-**Option A — Online Preparation: R1,000**
-• Face-to-face and online blended learning experience
-• Full coverage of all 10 RE 5 modules
-• Live facilitator-led training sessions
-• Access to experienced instructors throughout the programme
-• Comprehensive study guides and practice examinations
-• Web pocket quick learning platform
-• Podcasts and revision support material
-• Pre-recorded video course explainers
-• Mock examinations under exam conditions
-• Topic-based questions and activities
-• 24/7 access to recorded sessions
+In the meantime, do you have any other questions I can help you with? 😊`;
+          } else {
+            response = `Perfect! Thank you so much for providing all your details, ${leadInfo.fullName || 'there'}. 
 
-**Option B — Face-to-Face Preparation: R1,500**
-• **Includes everything the online learner gets**
-• Plus: Attends every Monday for 6 weeks at our headquarters
-• In-person instruction at: 367 Surrey Avenue, Ground Floor, Block B, Randburg
+I'll pass everything along to our management team right away, and they will send you:
+📋 The Registration Form
+🧾 The Invoice  
+📎 Any additional enrolment documentation you need
 
-### COMPETITOR CONTEXT (USE TO SHOW CORNERSTONE VALUE):
-Moonstone (the official examination body) also offers an online RE 5 preparation course at **R2,850**. Cornerstone Supreme offers the same quality preparation at just **R1,000 online** or **R1,500 face-to-face** — that's a significant saving while getting comprehensive preparation.
+This will be sent to ${leadInfo.email || 'your email'} shortly. In the meantime, do you have any other questions I can help you with? 😊`;
+          }
+          ctx.stage = 'closed';
+        } else if (missing.length <= 2 && (leadInfo.fullName && leadInfo.email)) {
+          response = `Thank you, ${leadInfo.fullName}! I have most of your details. Just to complete everything, could you also share ${missing.join(' and ')}?
 
-### RE 5 EXAM PROCESS (IMPORTANT — TELL EVERY PROSPECT):
-After completing the 6-week preparation with Cornerstone Supreme, the learner must **book independently at Moonstone** to write the official RE 5 examination. Cornerstone prepares you thoroughly — Moonstone administers the exam.
+Once I have that, our management team will send your registration form and invoice directly to you.`;
+        } else {
+          response = `Thank you for that! To get your registration processed smoothly, could you also share ${missing.join(', ')}?
 
-Step 1: Complete your 6-week preparation with us
-Step 2: Book your exam directly at Moonstone (we'll guide you on how)
-Step 3: Write the exam and get certified
+This helps our management team prepare your registration pack with everything you need.`;
+        }
+      } else {
+        response = `Thank you for getting in touch! To help me assist you better, could you share a bit more about yourself?
 
-### MOONSTONE EXAM BOOKING FEE (CRITICAL — DO NOT CONFUSE WITH CORNERSTONE'S PREP PRICE):
-The fee to book and write the official RE 5 examination at Moonstone is **R1,300**. This is paid directly to Moonstone — it is NOT included in Cornerstone's preparation course fee.
+• Your full name and surname
+• What field or career you're interested in
+• Whether you're looking to study online while working
 
-**DO NOT confuse these two different prices:**
-- **Cornerstone RE 5 Online Preparation = R1,000** (what YOU pay Cornerstone for the 6-week preparation course)
-- **Cornerstone RE 5 Face-to-Face Preparation = R1,500** (what YOU pay Cornerstone for the 6-week in-person course)
-- **Moonstone RE 5 Exam Booking Fee = R1,300** (what you pay Moonstone to WRITE the official exam — this is SEPARATE from Cornerstone's fee)
-
-When a learner asks "how much does the RE 5 cost" — clarify both fees: "The preparation course with us is R1,000 online or R1,500 face-to-face. The exam booking at Moonstone is a separate R1,300 which you pay directly to them."
-
-### RE 5 PAYMENT RULES (STRICT — ONLY RE 5 HAS THIS RULE):
+This will help me recommend the best programme for your goals. 😊`;
+      }
+      break;
 • **Full upfront payment only** — NO instalments for RE 5
 • Payment via EFT or at the office only
 • **NO e-commerce payment on the website**
