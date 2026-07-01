@@ -1447,57 +1447,37 @@ async function generateAIResponse(studentMsg, phone) {
   const leadInfo = extractLeadInfo(phone, studentMsg);
   const courseInterest = extractCourseMention(studentMsg);
   if (leadInfo.fullName && (leadInfo.email || leadInfo.altPhone)) {
-    saveLead(phone, leadInfo, courseInterest);
-  }
-  
-  if (!OPENAI_API_KEY) return fallbackResponse(studentMsg, phone);
-  
+  // ============================================================
+// WHATSAPP API
+// ============================================================
+async function sendWhatsAppMessage(to, message) {
+  if (!API_KEY) { console.log('No API key configured'); return; }
   try {
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    await fetch(`${WHATSAPP_API}/messages`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${OPENAI_API_KEY}` },
-      body: JSON.stringify({ model: 'gpt-4o-mini', messages, temperature: 0.7, max_tokens: 500 })
+      headers: { 'Content-Type': 'application/json', 'D360-API-Key': API_KEY },
+      body: JSON.stringify({ messaging_product: 'whatsapp', recipient_type: 'individual', to, type: 'text', text: { body: message } })
     });
-    
-    if (!response.ok) {
-      console.error('OpenAI error:', response.status);
-      return fallbackResponse(studentMsg, phone);
-    }
-    
-    const data = await response.json();
-    let aiReply = data.choices?.[0]?.message?.content?.trim();
-    if (!aiReply) return fallbackResponse(studentMsg, phone);
-    
-    // POST-PROCESSING SAFETY NET: If pre-AI check missed it, catch link denials here
-    const aiDeniedLink = /\b(not available|cannot provide|don't have|do not have|can't share|cannot share|unable to|not accessible|unfortunately|no.*form|don't.*form|do not.*form)\b/.test(aiReply.toLowerCase());
-    const aiHasLink = aiReply.includes('zjw4jz46ae4ok');
-    if (aiDeniedLink || !aiHasLink) {
-      // Check if ANY previous message in history mentions RE 5
-      const historyHasRE5Anywhere = ctx.message_history && ctx.message_history.some(m => 
-        m.msg && /\b(re\s*5|re5|regulatory exam)\b/.test(m.msg.toLowerCase())
-      );
-      if (historyHasRE5Anywhere && studentAsksForLink) {
-        console.log('RE5 SAFETY NET: Replacing AI response with link.');
-        aiReply = `Of course! Here is your RE 5 enrolment form:
-
-https://zjw4jz46ae4ok.kimi.page
-
-Please complete the form to secure your place. Once you've submitted it, our management team will follow up with you via email and send you:
-📋 Your Admission Letter
-🧾 The Invoice  
-📎 Any additional documentation needed
-
-Payment must be made in full upfront before the starting day. Is there anything else I can help you with? 😊`;
-}
-    }
-    
-    const intent = detectIntent(studentMsg);
-    const lang = detectLanguage(studentMsg);
-    updateContext(phone, intent, detectedCourse, studentMsg, aiReply);
-    return { response: aiReply, intent, lang };
-    
   } catch (err) {
-    console.error('OpenAI error:', err.message);
+    console.error('Send error:', err.message);
+  }
+}
+
+function saveConversation(phone, name, studentMsg, leratoReply, intent, lang) {
+  let conv = DB.conversations.find(c => c.student_phone === phone);
+  if (!conv) {
+    conv = { id: nextId('conversations'), student_phone: phone, student_name: name, language: lang, status: 'active', intent, last_message: studentMsg.substring(0, 200), message_count: 1, created_at: new Date().toISOString(), updated_at: new Date().toISOString() };
+    DB.conversations.push(conv);
+  } else {
+    conv.last_message = studentMsg.substring(0, 200);
+    conv.intent = intent;
+    conv.message_count = (conv.message_count || 0) + 1;
+    conv.updated_at = new Date().toISOString();
+  }
+  DB.messages.push({ id: nextId('messages'), conversation_id: conv.id, sender: 'student', content: studentMsg, created_at: new Date().toISOString() });
+  DB.messages.push({ id: nextId('messages'), conversation_id: conv.id, sender: 'lerato', content: leratoReply, created_at: new Date().toISOString() });
+  saveDB();
+}
     return fallbackResponse(studentMsg, phone);
   }
 }
