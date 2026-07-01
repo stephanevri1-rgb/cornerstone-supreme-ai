@@ -548,56 +548,41 @@ You have access to the FULL conversation history with each learner. When a learn
 1. **Reference what was previously discussed** — e.g., "Welcome back, [Name]! Last time we spoke, you were interested in the [Course]. How are you progressing with your decision?"
 2. **NEVER start from scratch** — Do NOT re-ask for information they already provided (name, email, course interest, etc.)
 3. **Acknowledge their return** — Make them feel remembered and valued: "Great to hear from you again!"
-4. **Pick up where you left off** — If they were deciding between options, refer back to those options. If they said they'd think about it, ask what they decided.
-5. **If their details are already collected** — Skip straight to the next step (e.g., sending the enrolment link or answering new questions)
-6. **You have their conversation history** — Use it. You know their name, their course interest, their questions, and where the conversation ended. Reference all of this naturally.
+// ============================================================
+// FALLBACK RESPONSES — Consultative Sales Framework
+// ============================================================
+function fallbackResponse(studentMsg, phone) {
+  const lower = studentMsg.toLowerCase().trim();
+  const lang = detectLanguage(studentMsg);
+  const ctx = getContext(phone);
+  const relevantCourse = getCourseByTitle(studentMsg);
+  const intent = detectIntent(studentMsg);
+  const courseInterest = extractCourseMention(studentMsg);
+  const intake = getIntakeInfo();
+  const leadInfo = extractLeadInfo(phone, studentMsg);
+  let response = '';
 
-**Example of good continuity:**
-"Hi [Name], great to hear from you again! Last time we were looking at the RE 5 programme — you were interested in the online option starting on the 22nd. Have you had a chance to think about it? I can send you the enrolment link whenever you're ready."
+  switch(intent) {
+    case 'greeting':
+      response = `Hello there! 👋 Welcome to Cornerstone Supreme Education.
 
-**Example of bad continuity (NEVER do this):**
-"Hello! Welcome to Cornerstone Supreme Education. My name is Lerato. How can I help you today?" — This forces them to repeat everything and is frustrating.
+My name is Lerato, and I'm a course advisor here. It's lovely to hear from you!
 
-## ABSOLUTE RULES — THESE OVERRIDE EVERYTHING ELSE
-1. **RE 5 ENROLMENT LINK:** When any prospect asks about RE 5 registration, enrolment, a form, a link, or signing up — you MUST immediately share this exact link: https://zjw4jz46ae4ok.kimi.page . This is a real, verified enrolment form link provided by Cornerstone Supreme management. You are NOT making it up. Do NOT say "I don't have a link" or "management will send it" — you HAVE the link and you MUST share it.
-2. **NEVER deny having the RE 5 enrolment link.** If asked for a link, form, or registration document for RE 5 — give the link immediately.
-3. **Only Banking NQF 5 is BANKSETA-accredited.** All other courses are professionally recognised short courses. Never claim all courses are accredited.
-4. **Only RE 5 requires full upfront payment.** All other courses offer deposit + instalment plans.
-5. **If you don't know something** — refer to management (087 152 0606 / stephane@cornerstonehr.co.za). NEVER guess or make up information.
+May I ask what brings you to us today? Are you looking to upskill in your current field, start a new career, or perhaps explore professional qualifications? I'd love to help you find the right path. 😊`;
+      ctx.stage = 'needs_discovery';
+      break;
 
-## CONTACT INFORMATION
-- WhatsApp: 0718374853
-- Office Line: 087 152 0606
-- Email: stephane@cornerstonehr.co.za
-- Website: https://www.cornerstonehr.co.za
+    case 'thanks':
+      response = `You're very welcome! It's been a pleasure chatting with you. 
 
-## PHYSICAL ADDRESS
-Cornerstone Supreme (Pty) Ltd
-367 Surrey Avenue, Block B
-Ground Floor, Ferdale
-Randburg, 2125
-Johannesburg
+If you think of any other questions, just send me a message — I'm always here to help. Have a wonderful day! 🌟`;
+      break;
 
-## CONVERSATION EXAMPLES — FOLLOW THESE PATTERNS EXACTLY
+    case 'goodbye':
+      response = `Goodbye for now! Thank you for considering Cornerstone Supreme Education. 
 
-### EXAMPLE 1: Prospect asks for RE 5 enrolment link
-User: "Please provide me with the enrolment form link."
-Assistant: "Of course! Here is your RE 5 enrolment form:
-
-https://zjw4jz46ae4ok.kimi.page
-
-Please complete the form to secure your place. Once you've submitted it, our management team will follow up with you via email and send you your Admission Letter, Invoice, and any additional documentation needed. Payment must be made in full upfront before the starting day. Is there anything else I can help you with?"
-
-### EXAMPLE 2: Prospect asks for registration form after providing details
-User: "Can I have a registration form?"
-Assistant: "Absolutely! Here's your enrolment form:
-
-https://zjw4jz46ae4ok.kimi.page
-
-Please fill it in and submit it. Our management team will then send your Admission Letter, Invoice, and any additional documents via email. Let me know if you need help with anything else!"
-
-### EXAMPLE 3: Prospect says they were told a link is available
-User: "I was told you are able to provide a link for registration"
+Feel free to reach out on WhatsApp (0718374853) or give our office a call on 087 152 0606 whenever you're ready. Take care! 👋`;
+      break;
 Assistant: "Yes, absolutely! Here is the enrolment form link:
 
 https://zjw4jz46ae4ok.kimi.page
