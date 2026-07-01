@@ -132,7 +132,226 @@ function trpc(data) {
 }
 
 function parseInput(req) {
-  return req.body?.json || req.body || {};
+const express = require('express');
+const cors = require('cors');
+const path = require('path');
+const fs = require('fs');
+const app = express();
+app.use(cors());
+app.use(express.json({ limit: '50mb' }));
+
+const API_KEY = process.env.API_KEY || '';
+const PHONE_NUMBER_ID = process.env.PHONE_NUMBER_ID || '';
+const WEBHOOK_VERIFY_TOKEN = process.env.WEBHOOK_VERIFY_TOKEN || 'cornerstone2024';
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY || '';
+const WHATSAPP_API = 'https://waba-v2.360dialog.io';
+
+const DB_FILE = path.join(__dirname, 'database.json');
+function loadDB() {
+  try { if (fs.existsSync(DB_FILE)) return JSON.parse(fs.readFileSync(DB_FILE, 'utf8')); } catch (e) {}
+  return {
+    courses: [
+      { id: 1, title: 'Entrepreneurship Training', category: 'Business', price: 'R4,500', duration: '6 months', desc: 'R1,000 deposit + R700 x5', status: 'published' },
+      { id: 2, title: 'Health and Safety Workplace', category: 'Health', price: 'R2,500', duration: '3 months', desc: 'R1,100 deposit + R700 x2', status: 'published' },
+      { id: 3, title: 'Health and Safety Short', category: 'Health', price: 'R1,300', duration: '3 weeks', desc: 'R800 deposit + R500 final', status: 'published' },
+      { id: 4, title: 'Human Resources Management', category: 'HR', price: 'R4,500', duration: '6 months', desc: 'R1,000 deposit + R700 x3', status: 'published' },
+      { id: 5, title: 'Logistics and Supply Chain', category: 'Business', price: 'R4,500', duration: '6 months', desc: 'R1,000 deposit + R700 x5', status: 'published' },
+      { id: 6, title: 'Medical Call Centre', category: 'Healthcare', price: 'R3,500', duration: '3 months', desc: 'R1,500 deposit + R1,000 x3', status: 'published' },
+      { id: 7, title: 'Financial Markets NQF 6', category: 'Finance', price: 'R22,000', duration: '12 months', desc: 'R2,000 deposit + R2,000 x10. NQF-aligned', status: 'published' },
+      { id: 8, title: 'Business Administration', category: 'Business', price: 'R4,500', duration: '6 months', desc: 'R1,000 deposit + R700 x5', status: 'published' },
+      { id: 9, title: 'Professional Receptionist', category: 'Business', price: 'R4,500', duration: '6 months', desc: 'R1,000 deposit + R700 x5', status: 'published' },
+      { id: 10, title: 'RE 5 Prep Online', category: 'Finance', price: 'R1,000', duration: '6 weeks', desc: 'FULL UPFRONT ONLY', status: 'published' },
+      { id: 11, title: 'RE 5 Prep Face-to-Face', category: 'Finance', price: 'R1,500', duration: '6 weeks', desc: 'FULL UPFRONT ONLY', status: 'published' },
+      { id: 12, title: 'Risk Management', category: 'Business', price: 'R6,000', duration: '3 weeks', desc: 'Contact management for plan', status: 'published' },
+      { id: 13, title: 'Banking NQF 5', category: 'Banking', price: 'R12,000', duration: '12 months', desc: 'BANKSETA-accredited! R1,000 + R1,000 x11', status: 'published' }
+    ],
+    students: [], conversations: [], messages: [], leads: [],
+    settings: {
+      companyName: 'Cornerstone Supreme Education', companyPhone: '0718374853',
+      officePhone: '087 152 0606', companyWebsite: 'https://www.cornerstonehr.co.za',
+      companyEmail: 'stephane@cornerstonehr.co.za',
+      bankName: 'FNB', accountName: 'Cornerstone Supreme',
+      accountNumber: '62653109283', branchCode: '261750', swiftCode: 'FIRNZAJJ'
+    },
+    context: {},
+    _nextId: { courses: 14, students: 1, conversations: 1, messages: 1, leads: 1 }
+  };
+}
+const DB = loadDB();
+function nextId(t) { if (!DB._nextId[t]) DB._nextId[t] = 1; return DB._nextId[t]++; }
+function saveDB() { fs.writeFileSync(DB_FILE, JSON.stringify(DB, null, 2)); }
+setInterval(saveDB, 30000);
+process.on('exit', saveDB);
+process.on('SIGINT', () => { saveDB(); process.exit(0); });
+
+function getCtx(p) { if (!DB.context[p]) DB.context[p] = { course_interest: '', history: [], lead: {} }; return DB.context[p]; }
+function updCtx(p, intent, course, student, ai) {
+  const c = getCtx(p);
+  if (course) c.course_interest = course;
+  c.history.push({ r: 'student', m: student });
+  c.history.push({ r: 'ai', m: ai });
+  if (c.history.length > 50) c.history = c.history.slice(-50);
+  saveDB();
+}
+
+function extractCourse(msg) {
+  const l = msg.toLowerCase();
+  if (l.includes('entrepreneurship')) return 'Entrepreneurship Training';
+  if (l.includes('hr') || l.includes('human resource')) return 'Human Resources Management';
+  if (l.includes('health and safety')) return 'Health and Safety Workplace';
+  if (l.includes('logistics') || l.includes('supply chain')) return 'Logistics and Supply Chain';
+  if (l.includes('medical call') || l.includes('call centre')) return 'Medical Call Centre';
+  if (l.includes('financial markets')) return 'Financial Markets NQF 6';
+  if (l.includes('business admin')) return 'Business Administration';
+  if (l.includes('receptionist')) return 'Professional Receptionist';
+  if (l.includes('re 5') || l.includes('re5') || l.includes('regulatory exam')) return 'RE 5 Prep Online';
+  if (l.includes('risk management')) return 'Risk Management';
+  if (l.includes('banking')) return 'Banking NQF 5';
+  return '';
+}
+
+function detectIntent(msg) {
+  const l = msg.toLowerCase();
+  if (/\b(hi|hello|hey)\b/.test(l)) return 'greeting';
+  if (/\b(price|cost|how much)\b/.test(l)) return 'pricing';
+  if (/\b(payment|pay|deposit)\b/.test(l)) return 'payment';
+  if (/\b(enroll|register|sign up)\b/.test(l)) return 'enroll';
+  if (/\b(course|programme|study)\b/.test(l)) return 'course';
+  if (/\b(thank|thanks)\b/.test(l)) return 'thanks';
+  if (/\b(bye|goodbye)\b/.test(l)) return 'bye';
+  if (/\b(name|email|phone|contact)\b/.test(l)) return 'lead';
+  if (/\b(intake|start|when)\b/.test(l)) return 'intake';
+  return 'general';
+}
+
+function getIntake() {
+  const n = new Date(), y = n.getFullYear(), m = n.getMonth();
+  const mn = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  let e = null;
+  for (let d = 1; d <= 5; d++) { const x = new Date(y, m, d); if (x.getDay() === 1) { e = x; break; } }
+  let l = null;
+  const ld = new Date(y, m + 1, 0).getDate();
+  for (let d = 24; d <= ld; d++) { const x = new Date(y, m, d); if (x.getDay() === 1) { l = x; break; } }
+  let nm = null;
+  for (let d = 1; d <= 5; d++) { const x = new Date(y, m + 1, d); if (x.getDay() === 1) { nm = x; break; } }
+  const t = new Date(); t.setHours(0, 0, 0, 0);
+  let cl, um;
+  if (e && e >= t) { cl = `Monday, ${e.getDate()} ${mn[e.getMonth()]}`; um = `Next intake: ${cl}. Spaces limited — register today!`; }
+  else if (l && l >= t) { cl = `Monday, ${l.getDate()} ${mn[l.getMonth()]}`; um = `Next intake: ${cl}. Register now!`; }
+  else { cl = `Monday, ${nm.getDate()} ${mn[nm.getMonth()]}`; um = `Next intake: ${cl}. Register now!`; }
+  return { cl, um };
+}
+
+function buildPrompt() {
+  const i = getIntake();
+  return `You are Lerato, a warm human Course Advisor at Cornerstone Supreme Education (South Africa). NEVER say you are AI/bot.
+
+CRITICAL RULES:
+1. When anyone asks for RE5 registration/form/link — share IMMEDIATELY: https://zjw4jz46ae4ok.kimi.page
+2. NEVER deny having the RE5 link. NEVER say "management will send it".
+3. ONLY Banking NQF 5 is BANKSETA-accredited. Others are short courses without NQF credits.
+4. ONLY RE5 requires full upfront. Others: deposit + instalments.
+5. Moonstone exam fee: R1,300 (separate). Cornerstone prep: R1,000 online / R1,500 face-to-face.
+
+PAYMENTS:
+- Entrepreneurship R4,500 = R1,000 + R700x5
+- Health Safety Workplace R2,500 = R1,100 + R700x2
+- Health Safety Short R1,300 = R800 + R500
+- HR Management R4,500 = R1,000 + R700x3
+- Logistics R4,500 = R1,000 + R700x5
+- Medical Call Centre R3,500 = R1,500 + R1,000x3
+- Financial Markets NQF6 R22,000 = R2,000 + R2,000x10
+- Business Admin R4,500 = R1,000 + R700x5
+- Receptionist R4,500 = R1,000 + R700x5
+- RE5 Online R1,000 = FULL UPFRONT
+- RE5 Face-to-Face R1,500 = FULL UPFRONT
+- Risk Management R6,000 = contact management
+- Banking NQF5 R12,000 = R1,000 + R1,000x11 (BANKSETA!)
+
+BANK: FNB | Account: Cornerstone Supreme | Number: 62653109283 | Branch: 261750 | SWIFT: FIRNZAJJ
+Proof to: stephane@cornerstonehr.co.za
+
+CONTACT: WhatsApp 0718374853 | Office 087 152 0606 | Email stephane@cornerstonehr.co.za
+
+RE5 SALES: Legal requirement problem → Online vs Face-to-Face → preference → intake → details → SHARE LINK https://zjw4jz46ae4ok.kimi.page → Admission Letter + Invoice emailed after submit.
+
+${i.um}`;
+}
+
+async function generateAI(studentMsg, phone) {
+  const ctx = getCtx(phone);
+  const course = extractCourse(studentMsg);
+  const isRE5 = (course && course.toLowerCase().includes('re 5')) ||
+    (ctx.course_interest && ctx.course_interest.toLowerCase().includes('re 5')) ||
+    ctx.history.some(h => h.m && /\bre\s*5\b/.test(h.m.toLowerCase()));
+  const asksLink = /\b(link|form|register|enrol|enroll|sign up|application)\b/.test(studentMsg.toLowerCase());
+  const msgs = [{ role: 'system', content: buildPrompt() }];
+  const recent = ctx.history.slice(-10);
+  for (const m of recent) msgs.push({ role: m.r === 'student' ? 'user' : 'assistant', content: m.m });
+  msgs.push({ role: 'user', content: studentMsg });
+  if (!OPENAI_API_KEY) { const r = fallback(studentMsg, phone); updCtx(phone, detectIntent(studentMsg), course, studentMsg, r.response); return r; }
+  try {
+    const res = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${OPENAI_API_KEY}` },
+      body: JSON.stringify({ model: 'gpt-4o-mini', messages: msgs, temperature: 0.7, max_tokens: 500 })
+    });
+    if (!res.ok) return fallback(studentMsg, phone);
+    const data = await res.json();
+    let reply = data.choices?.[0]?.message?.content?.trim() || '';
+    if (!reply) return fallback(studentMsg, phone);
+    const denied = /\b(not available|cannot provide|don't have|do not have|can't share|cannot share|unable to|no.*form)\b/.test(reply.toLowerCase());
+    const hasLink = reply.includes('zjw4jz46ae4ok');
+    if ((denied || !hasLink) && isRE5 && asksLink) {
+      reply = `Of course! Here is your RE 5 enrolment form:\n\nhttps://zjw4jz46ae4ok.kimi.page\n\nPlease complete the form to secure your place. Once submitted, our management team will email your Admission Letter and Invoice. Payment is full upfront. Any questions?`;
+    }
+    const intent = detectIntent(studentMsg);
+    updCtx(phone, intent, course, studentMsg, reply);
+    return { response: reply, intent };
+  } catch (e) { console.error('AI error:', e.message); return fallback(studentMsg, phone); }
+}
+
+function fallback(msg, phone) {
+  const l = msg.toLowerCase().trim();
+  const ctx = getCtx(phone);
+  const course = extractCourse(msg);
+  const intent = detectIntent(msg);
+  const i = getIntake();
+  let r = '';
+  switch (intent) {
+    case 'greeting': r = `Hello! Welcome to Cornerstone Supreme Education. I'm Lerato, your course advisor. What brings you to us today?`; break;
+    case 'pricing': r = course ? `The ${course} pricing is available. Which course would you like the exact price for?` : `Our courses range from R1,300 to R22,000. ${i.um} Which course interests you?`; break;
+    case 'payment': r = `Most courses offer deposit + monthly instalments (except RE5: full upfront). Bank: FNB, Account: Cornerstone Supreme, 62653109283. Proof to stephane@cornerstonehr.co.za. Which course?`; break;
+    case 'enroll': r = course && course.toLowerCase().includes('re 5') ? `Excellent choice! ${i.um} Secure your place here: https://zjw4jz46ae4ok.kimi.page. After submitting, management emails your Admission Letter + Invoice. Full upfront payment. What's your name and email?` : `I'd love to help you enrol! Visit www.cornerstonehr.co.za or tell me which course and I'll start the process. Which course?`; break;
+    case 'course': r = `We offer: Finance & Banking (RE5, Banking NQF5, Financial Markets), Business & HR (Entrepreneurship, HR, Admin, Receptionist, Logistics, Risk), Healthcare (Medical Call Centre, Health & Safety). ${i.um} Which field?`; break;
+    case 'thanks': r = `You're welcome! Message me anytime. Have a great day!`; break;
+    case 'bye': r = `Goodbye! Reach us on 0718374853 or 087 152 0606 anytime. Take care!`; break;
+    case 'lead': r = `Thank you! To get your registration sorted, could you share your full name, email, phone, and which course you're interested in?`; break;
+    case 'intake': r = `${i.um} Would you like me to help with registration?`; break;
+    default:
+      if (/\bre\s*5\b/.test(l)) { r = `The RE5 is legally required for financial services. We offer Online (R1,000) and Face-to-Face (R1,500), both 6 weeks. After prep, book the R1,300 exam at Moonstone. Which method — Online or Face-to-Face?`; ctx.course_interest = 'RE 5'; }
+      else if (/\b(accredit|nqf|certificate|saqa)\b/.test(l)) r = `Only Banking NQF5 is BANKSETA-accredited. Financial Markets NQF6 is NQF-aligned. All others are professionally recognised short courses without NQF credits. Which course?`;
+      else if (course) r = `${course} is a great choice! ${i.um} Interested?`;
+      else r = `Hi! I'm Lerato from Cornerstone Supreme. We offer professional courses in Finance, Business, and Healthcare. ${i.um} What field interests you?`;
+  }
+  updCtx(phone, intent, course, msg, r);
+  return { response: r, intent };
+}
+
+async function sendWA(to, msg) { if (!API_KEY) return; try { await fetch(`${WHATSAPP_API}/messages`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'D360-API-Key': API_KEY }, body: JSON.stringify({ messaging_product: 'whatsapp', to, type: 'text', text: { body: msg } }) }); } catch (e) { console.error('Send error:', e.message); } }
+
+function saveConv(phone, name, s, r, intent) { let c = DB.conversations.find(x => x.student_phone === phone); if (!c) { c = { id: nextId('conversations'), student_phone: phone, student_name: name, status: 'active', intent, last_message: s.substring(0, 200), msg_count: 1, created_at: new Date().toISOString(), updated_at: new Date().toISOString() }; DB.conversations.push(c); } else { c.last_message = s.substring(0, 200); c.intent = intent; c.msg_count++; c.updated_at = new Date().toISOString(); } DB.messages.push({ id: nextId('messages'), conversation_id: c.id, sender: 'student', content: s, created_at: new Date().toISOString() }); DB.messages.push({ id: nextId('messages'), conversation_id: c.id, sender: 'lerato', content: r, created_at: new Date().toISOString() }); saveDB(); }
+
+app.get('/api/ping', (req, res) => res.json({ ok: true, ai: OPENAI_API_KEY ? 'openai' : 'fallback' }));
+app.get('/api/webhook/whatsapp', (req, res) => { if (req.query['hub.mode'] === 'subscribe' && req.query['hub.verify_token'] === WEBHOOK_VERIFY_TOKEN) res.status(200).send(req.query['hub.challenge']); else res.sendStatus(403); });
+app.post('/api/webhook/whatsapp', async (req, res) => { res.sendStatus(200); try { const msgs = req.body?.entry?.[0]?.changes?.[0]?.value?.messages; if (!msgs || !msgs.length) return; const m = msgs[0], from = m.from, text = m.text?.body || '', name = m.contacts?.[0]?.profile?.name || 'Student'; const { response: r, intent } = await generateAI(text, from); saveConv(from, name, text, r, intent); await sendWA(from, r); } catch (e) { console.error('Webhook error:', e.message); } });
+
+const pp = path.join(__dirname, 'public');
+app.use(express.static(pp));
+app.get('*', (req, res) => res.sendFile(path.join(pp, 'index.html')));
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => { console.log('Lerato AI LIVE on port', PORT); console.log('Mode:', OPENAI_API_KEY ? 'GPT-4o Mini' : 'Fallback'); console.log('Webhook: /api/webhook/whatsapp'); });  return req.body?.json || req.body || {};
 }
 
 // ============================================================
