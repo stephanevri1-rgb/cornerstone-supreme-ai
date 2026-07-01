@@ -1601,99 +1601,98 @@ I'll pass everything along to our management team right away, and they will send
 📎 Any additional enrolment documentation you need
 
 This will be sent to ${leadInfo.email || 'your email'} shortly. In the meantime, do you have any other questions I can help you with? 😊`;
-          }
-          ctx.stage = 'closed';
-        } else if (missing.length <= 2 && (leadInfo.fullName && leadInfo.email)) {
-          response = `Thank you, ${leadInfo.fullName}! I have most of your details. Just to complete everything, could you also share ${missing.join(' and ')}?
+// ============================================================
+// API ROUTES
+// ============================================================
+app.get('/api/ping', (req, res) => res.json(trpc({ ok: true, db: 'json-file', ai: OPENAI_API_KEY ? 'openai' : 'rule-based' })));
 
-Once I have that, our management team will send your registration form and invoice directly to you.`;
-        } else {
-          response = `Thank you for that! To get your registration processed smoothly, could you also share ${missing.join(', ')}?
+app.post('/api/trpc/courses.list', (req, res) => {
+  const input = parseInput(req);
+  let result = DB.courses.filter(c => c.status === 'published');
+  if (input.category) result = result.filter(c => c.category === input.category);
+  if (input.search) result = result.filter(c => c.title.toLowerCase().includes(input.search.toLowerCase()));
+  res.json(trpc(result.reverse()));
+});
 
-This helps our management team prepare your registration pack with everything you need.`;
-        }
-      } else {
-        response = `Thank you for getting in touch! To help me assist you better, could you share a bit more about yourself?
+app.post('/api/trpc/courses.count', (req, res) => res.json(trpc(DB.courses.filter(c => c.status === 'published').length)));
 
-• Your full name and surname
-• What field or career you're interested in
-• Whether you're looking to study online while working        
-This will help me recommend the best programme for your goals. 😊`;
-      }
-      break;
+app.post('/api/trpc/courses.create', (req, res) => {
+  const input = parseInput(req);
+  const course = { id: nextId('courses'), title: input.title, category: input.category, price: input.price, duration: input.duration, description: input.description, format: input.format || 'Online', certification: input.certification || 'Certificate of Completion', status: 'published', created_at: new Date().toISOString() };
+  DB.courses.push(course); saveDB();
+  res.json(trpc({ id: course.id }));
+});
 
-    case 'pricing':
-      if (relevantCourse) {
-        const isRE5 = relevantCourse.title.toLowerCase().includes('re 5');
-        let paymentInfo = '';
-        if (isRE5) {
-          paymentInfo = `Payment for RE 5 is **full upfront only** — no instalments. We accept EFT or payment at our office. NO e-commerce payments on the website.`;
-        } else {
-          paymentInfo = `We offer a flexible payment plan for this course — a deposit plus monthly instalments to make it affordable. I can give you the exact breakdown if you'd like!`;
-        }
-        response = `The ${relevantCourse.title} is ${relevantCourse.price} for the full ${relevantCourse.duration} programme.
+app.post('/api/trpc/students.list', (req, res) => {
+  const input = parseInput(req);
+  let result = [...DB.students];
+  if (input.status) result = result.filter(s => s.status === input.status);
+  res.json(trpc(result.reverse()));
+});
 
-${paymentInfo}
+app.post('/api/trpc/students.create', (req, res) => {
+  const input = parseInput(req);
+  const student = { id: nextId('students'), name: input.name, phone: input.phone, email: input.email || null, status: input.status || 'new', source: input.source || 'whatsapp', created_at: new Date().toISOString() };
+  DB.students.push(student); saveDB();
+  res.json(trpc({ id: student.id }));
+});
 
-${intake.urgencyMessage}
+app.post('/api/trpc/students.bulkImport', (req, res) => {
+  const input = parseInput(req);
+  let count = 0;
+  for (const s of (input.leads || [])) {
+    DB.students.push({ id: nextId('students'), name: s.name, phone: s.phone, email: s.email || null, status: s.status || 'interested', source: 'bulk_import', created_at: new Date().toISOString() });
+    count++;
+  }
+  saveDB();
+  res.json(trpc({ inserted: count, total: input.leads?.length || 0 }));
+});
 
-Would you like me to walk you through the registration process?`;
-      } else {
-        response = `Our courses range from R1,300 to R22,000 depending on the programme and level.
+app.post('/api/trpc/conversations.list', (req, res) => {
+  res.json(trpc([...DB.conversations].sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at)).slice(0, 50)));
+});
 
-Here's a quick overview:
-• Short Certificate Courses: R1,300 – R3,500
-• Advanced Certificate Programmes: R4,500
-• Specialist Programmes: R6,000
-• National Certificate Banking NQF 5: R12,000
-• National Certificate Financial Markets NQF 6: R22,000
+app.post('/api/trpc/messages.list', (req, res) => {
+  const input = parseInput(req);
+  res.json(trpc(DB.messages.filter(m => m.conversation_id === input.conversationId)));
+});
 
-Most of our courses offer flexible deposit + monthly instalment payment plans. Only the RE 5 preparation requires full upfront payment.
+app.post('/api/trpc/enrollments.list', (req, res) => res.json(trpc([...DB.enrollments].reverse())));
 
-${intake.urgencyMessage}
+app.post('/api/trpc/enrollments.create', (req, res) => {
+  const input = parseInput(req);
+  const enroll = { id: nextId('enrollments'), student_name: input.studentName, student_phone: input.studentPhone, course_name: input.courseName, amount: input.amount || '', status: input.status || 'pending', created_at: new Date().toISOString() };
+  DB.enrollments.push(enroll); saveDB();
+  res.json(trpc({ id: enroll.id }));
+});
 
-Which area interests you — Finance, Business & HR, or Healthcare? I can give you exact pricing and the payment plan for any specific course. 😊`;
-      }
-      break;
+app.post('/api/trpc/brochures.list', (req, res) => {
+  res.json(trpc([...DB.brochures].reverse().map(b => ({ id: b.id, name: b.name, filename: b.filename, mime_type: b.mime_type, size: b.size, category: b.category, is_default: b.is_default, created_at: b.created_at }))));
+});
 
-    case 'courses':
-      response = `Great question! We have a wide range of professional programmes. Here's what we offer:
+app.post('/api/trpc/brochures.upload', (req, res) => {
+  const input = parseInput(req);
+  const isDefault = DB.brochures.length === 0 ? 1 : 0;
+  const brochure = { id: nextId('brochures'), name: input.name, filename: input.filename, mime_type: input.mimeType, size: input.size, data: input.data, category: input.category || 'General', is_default: isDefault, created_at: new Date().toISOString() };
+  DB.brochures.push(brochure); saveDB();
+  res.json(trpc({ id: brochure.id, isDefault: isDefault === 1 }));
+});
 
-📊 **Finance & Banking**
-• RE 5 Exam Prep — R1,500 (6 weeks)
-• National Certificate Banking NQF 5 — R12,000 (12 months) — BankSETA Accredited
-• Financial Markets NQF 6 — R22,000 (12 months)
+app.post('/api/trpc/brochures.delete', (req, res) => {
+  const input = parseInput(req);
+  DB.brochures = DB.brochures.filter(b => b.id !== input.id);
+  saveDB();
+  res.json(trpc({ success: true }));
+});
 
-👔 **Business & HR**
-• Entrepreneurship — R4,500 (6 months)
-• HR Management — R4,500 (6 months)
-• Business Administration — R4,500 (6 months)
-• Professional Receptionist — R4,500 (6 months)
-• Logistics & Supply Chain — R4,500 (6 months)
-
-🏥 **Healthcare & Safety**
-• Medical Call Centre — R3,500 (3 months)
-• Health & Safety — R2,500 (3 months) / R1,300 (3 weeks)
-• Risk Management — R6,000 (3 weeks)
-
-${intake.urgencyMessage}
-
-All our certifications are industry-recognised and SAQA-aligned. Which field are you most drawn to? 😊`;
-      break;
-
-    case 'enrollment':
-      if (relevantCourse) {
-        const isRE5Enroll = relevantCourse.title.toLowerCase().includes('re 5');
-        if (isRE5Enroll) {
-          response = `Excellent choice! The ${relevantCourse.title} is the best step toward your career in financial services. Here's how to get started:
-
-${intake.urgencyMessage}
-
-To secure your place, please complete your enrolment right now using this link: https://zjw4jz46ae4ok.kimi.page
-
-Once you've submitted the form, our management team will follow up with you via email and send you your Admission Letter, Invoice, and any additional documentation needed. Payment must be made in full upfront before the starting day.
-
-Could you also share with me:
+app.get('/api/brochures/:id', (req, res) => {
+  const b = DB.brochures.find(b => b.id === parseInt(req.params.id));
+  if (!b) return res.status(404).send('Not found');
+  const binary = Buffer.from(b.data, 'base64');
+  res.set('Content-Type', b.mime_type);
+  res.set('Content-Disposition', `inline; filename="${b.filename}"`);
+  res.send(binary);
+});Could you also share with me:
 • Your full name and surname
 • Your email address
 • An alternative contact number
