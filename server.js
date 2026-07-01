@@ -797,58 +797,63 @@ I can have our management team send you the registration form and invoice direct
 • Monthly Instalment: R2,000 x 10 months
 • Total: R22,000
 • Format: R2,000 deposit + 10 monthly instalments of R2,000
+    case 'contact':
+      response = `You can reach us in a few ways:
 
-### 8. ONLINE ADVANCED BUSINESS ADMINISTRATION — R4,500 (6 months)
-• Deposit: R1,000 (to be paid before commencing training)
-• Monthly Instalment: R700 x 5 months after the deposit
-• Total: R4,500
-• Format: R1,000 deposit + 5 monthly instalments of R700
+📱 WhatsApp: 0718374853
+☎️ Office Line: 087 152 0606
+📧 Email: stephane@cornerstonehr.co.za
+🌐 Website: https://www.cornerstonehr.co.za
 
-### 9. PROFESSIONAL RECEPTIONIST — R4,500 (6 months)
-• Deposit: R1,000 (pay before commencing training to secure your place)
-• Monthly Instalment: R700 x 5 months after your deposit
-• Total: R4,500
-• Format: R1,000 deposit + 5 monthly instalments of R700
+📍 Our Office:
+Cornerstone Supreme (Pty) Ltd
+367 Surrey Avenue, Block B
+Ground Floor, Ferdale
+Randburg, 2125
+Johannesburg
 
-### 10. RE 5 REGULATORY EXAMINATION PREPARATION (ONLINE) — R1,000 (6 weeks)
-• **FULL UPFRONT PAYMENT ONLY — NO INSTALMENTS**
-• Payment via EFT or at the office only
-• NO e-commerce payment on the website
-• Must be paid in full before the starting day
+Is there something specific I can help you with right now? 😊`;
+      break;
 
-### 11. RE 5 REGULATORY EXAMINATION PREPARATION (FACE-TO-FACE) — R1,500 (6 weeks)
-• **FULL UPFRONT PAYMENT ONLY — NO INSTALMENTS**
-• Payment via EFT or at the office only
-• NO e-commerce payment on the website
-• Must be paid in full before the starting day
-• Includes everything from the online programme plus in-person sessions every Monday for 6 weeks at 367 Surrey Avenue, Randburg
+    default:
+      if (/\b(pay|payment|installment|deposit|eft|transfer)\b/.test(lower)) {
+        response = `Most of our courses offer a **flexible deposit + monthly instalment plan** to make your investment manageable. Only the RE 5 Regulatory Examination Preparation requires full upfront payment.
 
-### 12. RISK MANAGEMENT TRAINING PROGRAMME — R6,000 (3 weeks)
-• Available Online and Face-to-Face
-• Payment options: Deposit + instalment arrangement available. Refer prospect to management for specific payment plan details: 087 152 0606 / stephane@cornerstonehr.co.za
+To give you the exact payment breakdown, could you let me know which course you're interested in? Each programme has its own specific deposit and instalment structure.
 
-### 13. NATIONAL CERTIFICATE BANKING NQF 5 — R12,000 (12 months)
-• Deposit: R1,000 (low deposit to begin training immediately)
-• Monthly Instalment: R1,000 x 11 months
-• Total: R12,000
-• Format: R1,000 deposit + 11 monthly instalments of R1,000
+Our banking details for any payment:
+🏦 Bank: FNB
+📋 Account Name: Cornerstone Supreme
+📋 Account Number: 62653109283
+📋 Branch Code: 261750
+📋 SWIFT Code: FIRNZAJJ (for international payments)
+📝 Reference: Your Name
 
----
-
-### PAYMENT ACCURACY RULES — NEVER GET THIS WRONG:
-1. **If the prospect asks about RE 5 payment** → Always say "full upfront payment only, no instalments"
-2. **If the prospect asks about ANY OTHER course** → Give the specific deposit + instalment structure from the list above. NEVER say "full upfront only" for non-RE5 courses.
-3. **If you're unsure about a specific course's payment structure** → Say: "Let me confirm the exact payment plan for that course with our management team and get back to you." Then refer to 087 152 0606 or stephane@cornerstonehr.co.za
-4. **NEVER make up payment amounts** — use only the exact figures listed above
-5. **NEVER assume all courses work the same way** — each course has its own specific payment structure
-6. **When presenting payment options** → always lead with the deposit + instalment option (except RE 5), as this makes the course more accessible. Mention: "We have a flexible payment plan to make it easier for you."
-
-### BANKING DETAILS (FOR ALL COURSES):
-Bank: FNB | Account Name: Cornerstone Supreme | Account Number: 62653109283 | Branch Code: 261750 | SWIFT Code: FIRNZAJJ (for international payments)
-Reference: Your Name
 Send proof of payment to stephane@cornerstonehr.co.za
 
-## SALES AND CLIENT ENGAGEMENT FRAMEWORK — FOLLOW THIS STRICTLY
+Which course would you like the payment plan for? 😊`;
+      } else if (/\b(address|location|office|where are you|visit|physical|postal|direction)\b/.test(lower)) {
+        response = `Our office is located at:
+
+📍 Cornerstone Supreme (Pty) Ltd
+367 Surrey Avenue, Block B
+Ground Floor, Ferdale
+Randburg, 2125
+Johannesburg
+
+You can also reach us on:
+📱 WhatsApp: 0718374853
+☎️ Office: 087 152 0606
+📧 Email: stephane@cornerstonehr.co.za
+
+Would you like to book a visit or do you have questions about our courses?`;
+      } else if (/\b(requirement|need|matric|grade|qualification|entry requirement)\b/.test(lower)) {
+        response = `Most of our courses require a Matric certificate and basic computer literacy. For the NQF 5 and NQF 6 qualifications, work experience in the field is a plus but not always required.
+
+${intake.urgencyMessage}
+
+Which course are you interested in? I can tell you the specific requirements for that one, and we can check if you're a good fit. 😊`;
+      } else if (/\b(duration|how long|period|time)\b/.test(lower)) {## SALES AND CLIENT ENGAGEMENT FRAMEWORK — FOLLOW THIS STRICTLY
 
 ### STEP 1: GREETING
 Professionally greet the prospect. Be warm and welcoming.
