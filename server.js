@@ -698,57 +698,63 @@ Which area interests you — Finance, Business & HR, or Healthcare? I can give y
 • Logistics & Supply Chain — R4,500 (6 months)
 
 🏥 **Healthcare & Safety**
-• Medical Call Centre — R3,500 (3 months)
-• Health & Safety — R2,500 (3 months) / R1,300 (3 weeks)
-• Risk Management — R6,000 (3 weeks)
+    case 'enrollment':
+      if (relevantCourse) {
+        const isRE5Enroll = relevantCourse.title.toLowerCase().includes('re 5');
+        if (isRE5Enroll) {
+          response = `Excellent choice! The ${relevantCourse.title} is the best step toward your career in financial services. Here's how to get started:
 
 ${intake.urgencyMessage}
 
-All our certifications are industry-recognised and SAQA-aligned. Which field are you most drawn to? 😊`;
-      break;
-- Step 7: **SHARE THE ENROLMENT FORM LINK DIRECTLY** — This is CRITICAL. Do NOT say "management will send you the registration form." Instead, immediately share this link: **https://zjw4jz46ae4ok.kimi.page**
-  
-  Example Step 7 message: "Thank you so much, [Name]! To secure your place for the RE 5 programme starting [date], please complete your enrolment right now using this link: https://zjw4jz46ae4ok.kimi.page
+To secure your place, please complete your enrolment right now using this link: https://zjw4jz46ae4ok.kimi.page
 
-  Once you've submitted the form, our management team will follow up with you via email and send you your Admission Letter, Invoice, and any additional documentation needed. Payment must be made in full upfront before the starting day.
+Once you've submitted the form, our management team will follow up with you via email and send you your Admission Letter, Invoice, and any additional documentation needed. Payment must be made in full upfront before the starting day.
 
-  Is there anything else I can help you with in the meantime?"
+Could you also share with me:
+• Your full name and surname
+• Your email address
+• An alternative contact number
 
-  **REMEMBER:** For RE 5 enquiries ONLY, YOU share the enrolment link directly. For all other courses, management sends the registration form via email.
+This way we can have everything prepared for you right away! 😊`;
+        } else {
+          response = `Excellent choice! The ${relevantCourse.title} is a fantastic programme. Here's how to get started:
 
-KEY: Do not overwhelm. One step at a time. Each message should move the prospect closer to a decision.
-
-### RE 1 vs RE 5 — ACCURATE INFORMATION (DO NOT GET THIS WRONG):
-Cornerstone Supreme offers RE 5 preparation. If asked about RE 1 vs RE 5, here is the CORRECT information:
-
-- **RE 1**: For **Key Individuals (KIs)** — those in management/supervisory roles who oversee a financial services practice
-- **RE 5**: For **Representatives** — individual financial advisors who provide financial advice to clients
-
-**DO NOT mix these up.** RE 1 is NOT for entry-level and RE 5 is NOT for management — that is backwards and wrong. If unsure, refer the prospect to management rather than guessing.
-
-### RE 5 INTAKE DATES (THIS MONTH):
-• 22nd of this month
-• 29th of this month
-Learner should decide which date suits them. Payment must be made in full upfront before the starting day.
-
-## WEBSITE AND LMS ACCESS
-• Main Website: www.cornerstonehr.co.za
-• LMS Login (study kit): www.cornerstonehr.co.za/lms
-• Alternative LMS: www.cornerstonehr.co.za/learn
-
-## CURRENT INTAKE INFORMATION (AUTOMATICALLY UPDATED)
 ${intake.urgencyMessage}
 
-When discussing intakes:
-- ALWAYS present the current intake as the relevant registration opportunity
-- Create a sense of urgency — spaces are limited
-- Guide prospects toward securing their place NOW
-- Do NOT mention that bookings happen every month
-- Do NOT reveal the full intake schedule
-- Focus on the current intake period only
-- Use phrases like "our upcoming intake", "the next available intake", "register now to secure your spot"
+To register, simply:
+1️⃣ Visit https://www.cornerstonehr.co.za and click "Enrol Now"
+2️⃣ Fill in your details
+3️⃣ Choose your preferred payment option
+4️⃣ Our team will send you confirmation within 24 hours
 
-## BANKING DETAILS
+Or, to make it even easier, I can pass your details directly to our management team and they'll send you the registration form and invoice. 
+
+Could you share with me:
+• Your full name and surname
+• Your email address
+• An alternative contact number
+
+This way we can get everything prepared for you right away!`;
+        }
+      } else {
+        response = `I'd love to help you get enrolled! Here's how it works:
+
+${intake.urgencyMessage}
+
+1️⃣ Visit https://www.cornerstonehr.co.za and select your course
+2️⃣ Click "Enrol Now" and fill in your details
+3️⃣ Choose your payment option — most courses offer a deposit + monthly instalment plan (only RE 5 requires full upfront payment)
+4️⃣ You'll receive confirmation within 24 hours
+
+Or, if you'd like, I can have our management team send the registration documents directly to you. Just share:
+• Your full name and surname
+• Which course you're interested in
+• Your email address
+
+Which course has caught your eye?`;
+      }
+      ctx.stage = 'lead_collection';
+      break;## BANKING DETAILS
 Bank: FNB | Account Name: Cornerstone Supreme | Account Number: 62653109283 | Branch Code: 261750 | SWIFT Code: FIRNZAJJ (for international payments)
 Reference: Your Name
 Send proof of payment to stephane@cornerstonehr.co.za
