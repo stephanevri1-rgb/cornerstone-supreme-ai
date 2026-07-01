@@ -187,17 +187,6 @@ async function chamiloAuthenticate() {
     return null;
   }
 }
-  // Determine which intake to promote (must be in the future)
-  let currentIntake = null;
-  let currentIntakeLabel = '';
-  let urgencyMessage = '';
-  
-  if (earlyIntake) {
-    const earlyDate = new Date(earlyIntake);
-    earlyDate.setHours(0, 0, 0, 0);
-    if (earlyDate >= today) {
-      currentIntake = earlyIntake;
-      currentIntakeLabel = `Monday, ${earlyIntake.getDate()} ${monthNames[earlyIntake.getMonth()]} ${earlyIntake.getFullYear()}`;
       const daysUntil = Math.ceil((earlyIntake - today) / (1000 * 60 * 60 * 24));
       if (daysUntil <= 7) {
         urgencyMessage = `Our next intake is coming up very soon — ${currentIntakeLabel}. Spaces are limited, so I'd recommend securing your spot today to avoid missing out.`;
