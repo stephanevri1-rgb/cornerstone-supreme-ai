@@ -648,56 +648,64 @@ This will help me recommend the best programme for your goals. 😊`;
       }
       break;
 • Payment via EFT or at the office only
-• **NO e-commerce payment on the website**
-• Must be paid in full before the starting day
-• Banking details: FNB, Account Name: Cornerstone Supreme, Account: 62653109283, Branch: 261750, SWIFT: FIRNZAJJ, Reference: Your Name
-• Proof of payment to: stephane@cornerstonehr.co.za
-• **IMPORTANT:** The RE 5 exam booking fee (R1,300 at Moonstone) is SEPARATE from the Cornerstone preparation course fee and is paid directly to Moonstone
+    case 'pricing':
+      if (relevantCourse) {
+        const isRE5 = relevantCourse.title.toLowerCase().includes('re 5');
+        let paymentInfo = '';
+        if (isRE5) {
+          paymentInfo = `Payment for RE 5 is **full upfront only** — no instalments. We accept EFT or payment at our office. NO e-commerce payments on the website.`;
+        } else {
+          paymentInfo = `We offer a flexible payment plan for this course — a deposit plus monthly instalments to make it affordable. I can give you the exact breakdown if you'd like!`;
+        }
+        response = `The ${relevantCourse.title} is ${relevantCourse.price} for the full ${relevantCourse.duration} programme.
 
-### RE 5 ENROLMENT FORM — SHARE THIS WITH EVERY RE 5 PROSPECT:
-When a prospective learner shows interest in the RE 5 programme and provides their name (or any personal details), you MUST share the enrolment form link immediately. This allows them to complete their registration right away.
+${paymentInfo}
 
-**Enrolment Form Link:** https://zjw4jz46ae4ok.kimi.page
+${intake.urgencyMessage}
 
-**When to share the link:**
-- As soon as the prospect provides their name in connection with RE 5
-- After they have selected their preferred intake date
-- Before they ask for it — be proactive
-- Anytime during the RE 5 sales conversation after initial interest is confirmed
+Would you like me to walk you through the registration process?`;
+      } else {
+        response = `Our courses range from R1,300 to R22,000 depending on the programme and level.
 
-**How to present it:**
-"Thank you, [Name]! To secure your place for the RE 5 programme starting on [date], please complete your enrolment using this link: https://zjw4jz46ae4ok.kimi.page
+Here's a quick overview:
+• Short Certificate Courses: R1,300 – R3,500
+• Advanced Certificate Programmes: R4,500
+• Specialist Programmes: R6,000
+• National Certificate Banking NQF 5: R12,000
+• National Certificate Financial Markets NQF 6: R22,000
 
-Once you've submitted the form, our management team will follow up with you via email and send you:
-📋 Your Admission Letter
-🧾 The Invoice
-📎 Any additional documentation needed to complete your registration
+Most of our courses offer flexible deposit + monthly instalment payment plans. Only the RE 5 preparation requires full upfront payment.
 
-Payment must be made in full upfront before the starting day.
+${intake.urgencyMessage}
 
-Is there anything else I can help you with in the meantime?"
+Which area interests you — Finance, Business & HR, or Healthcare? I can give you exact pricing and the payment plan for any specific course. 😊`;
+      }
+      break;
 
-**NEVER forget to share this link** — it is a critical part of the RE 5 registration process.
+    case 'courses':
+      response = `Great question! We have a wide range of professional programmes. Here's what we offer:
 
-### RE 5 SALES CLOSING FRAMEWORK — FOLLOW THIS FOR RE 5 ENQUIRIES:
-0. **Lead with the Problem** — Highlight the legal requirement. Without RE 5, they cannot legally work in financial services. Use fear of missing out.
-1. **Explain the Two Learning Methods** — Present both Online and Face-to-Face options clearly with their benefits.
-2. **Ask Which Method They Prefer** — "We offer two ways to study for your RE 5 — Online Learning and Face-to-Face Learning. Which study method would work best for you?"
-3. **Present Intake Dates with Choice-Based Close** — After they choose a method, present the dates and ask: "We currently have available intakes starting on 22 June 2026 and 29 June 2026. Which of these dates would you prefer to begin your RE5 programme?"
-4. **Use Social Proof** — Mention "hundreds of successful candidates" who have passed through Cornerstone Supreme.
-5. **Create Urgency** — Limited spaces per intake.
-6. **Keep it Scannable** — Use bullet points, emojis, and short paragraphs.
-7. **Include All Contact Methods** — Phone, WhatsApp, and physical address for credibility.
+📊 **Finance & Banking**
+• RE 5 Exam Prep — R1,500 (6 weeks)
+• National Certificate Banking NQF 5 — R12,000 (12 months) — BankSETA Accredited
+• Financial Markets NQF 6 — R22,000 (12 months)
 
-### RE 5 CONVERSATION FLOW (IN ADDITION TO EXISTING SALES FRAMEWORK):
-This is a step-by-step closing technique SPECIFIC to RE5 enquiries. Use it ON TOP OF the existing 7-step sales framework — not instead of it.
+👔 **Business & HR**
+• Entrepreneurship — R4,500 (6 months)
+• HR Management — R4,500 (6 months)
+• Business Administration — R4,500 (6 months)
+• Professional Receptionist — R4,500 (6 months)
+• Logistics & Supply Chain — R4,500 (6 months)
 
-- Step 1: Lead with the problem (legal requirement + FOMO)
-- Step 2: Explain the two learning methods clearly (Online vs Face-to-Face)
-- Step 3: Ask "Which study method do you prefer — Online Learning or Face-to-Face Learning?"
-- Step 4: WAIT for their response. Only then present intake dates.
-- Step 5: Ask "We currently have available intakes starting on 22 June 2026 and 29 June 2026. Which of these dates would you prefer to begin your RE5 programme?"
-- Step 6: After they pick a date, move to collecting their details (Full Name, DOB, Email, Phone) for registration
+🏥 **Healthcare & Safety**
+• Medical Call Centre — R3,500 (3 months)
+• Health & Safety — R2,500 (3 months) / R1,300 (3 weeks)
+• Risk Management — R6,000 (3 weeks)
+
+${intake.urgencyMessage}
+
+All our certifications are industry-recognised and SAQA-aligned. Which field are you most drawn to? 😊`;
+      break;
 - Step 7: **SHARE THE ENROLMENT FORM LINK DIRECTLY** — This is CRITICAL. Do NOT say "management will send you the registration form." Instead, immediately share this link: **https://zjw4jz46ae4ok.kimi.page**
   
   Example Step 7 message: "Thank you so much, [Name]! To secure your place for the RE 5 programme starting [date], please complete your enrolment right now using this link: https://zjw4jz46ae4ok.kimi.page
